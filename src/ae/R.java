@@ -3,17 +3,17 @@ package ae;
 import java.io.*;
 import java.util.Properties;
 
-/**
+/*
  * Ресурсный класс
- *
- * Modify:
 
+ Modify:
+    13.07.23 определил карту переноса в виде текстового файла
  */
 
 public class R {
-    private final static String Ver = "Ver. 1.9"; // номер версии
+    public final static String Ver = "Ver. 1.1"; // номер версии
     
-    final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
+    //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
     static String workDir =   null; // рабочий каталог. если null, возьмет системный временный каталог
 
@@ -119,7 +119,6 @@ public class R {
      */
     private ByteArrayOutputStream readResB(String nameRes)
     {
-        String str = null;
         try {
             // Get current classloader
             InputStream is = getClass().getResourceAsStream(nameRes);
