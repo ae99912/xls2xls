@@ -4,14 +4,16 @@ import java.io.*;
 import java.util.Properties;
 
 /*
- * Ресурсный класс
+ Ресурсный класс
 
  Modify:
-    13.07.23 определил карту переноса в виде текстового файла
+ 13.07.23 определил карту переноса в виде текстового файла
+ 14.07.23 запись Excel через временный файл
+
  */
 
 public class R {
-    public final static String Ver = "Ver. 1.1"; // номер версии
+    public final static String Ver = "Ver. 1.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

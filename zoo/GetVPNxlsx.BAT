@@ -19,6 +19,8 @@ rem архивный каталог
 SET ArchDir=%SrcDir%\Archive\%dt%
 IF NOT exist %ArchDir% mkdir %ArchDir%
 
+rem сделаем бакап выходного файла
+call :makeBak
 
 FOR %%I IN (02 12 13 16 18 21 43 52 56 58 59 63 64 73)  DO CALL :mkwork %%I%
 rem FOR %%I IN (02 13)  DO CALL :mkwork %%I%
@@ -26,6 +28,7 @@ rem FOR %%I IN (02 13)  DO CALL :mkwork %%I%
 GOTO :EOF
 
 :mkwork
+rem обработка регионального файла
 echo ========================================================
 rem echo Region %1
 set FIL="%SrcDIR%\%1_ПФО Форма отчета Android VPN"
@@ -41,9 +44,15 @@ goto :EOF
 echo Region %1 file exist - %XLSX%
 echo Begin work
 java -jar %MYJAR% %KARTA%%1.txt "%XLSX%"  "%OUTXLSX%"
-
 move "%XLSX%" %ArchDir%\
+goto :EOF
 
+
+:makeBak
+rem определим размер выходного файла и если он большой - сделаем копию
+set RF=0
+for %%I in (%OUTXLSX%) do  set RF=%%~zI%
+IF %RF% GTR 20000 copy %OUTXLSX% %OUTXLSX%.bak
 goto :EOF
 
 

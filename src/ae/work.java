@@ -12,7 +12,6 @@ package ae;
  */
 
 import org.apache.poi.ss.usermodel.Cell;
-
 import java.util.Set;
 
 public class work {
@@ -25,14 +24,14 @@ public class work {
     String str;
     Double dbl;
     int r, c;
+    // карта ячеек для копирования
     karta k = new karta();
     Set<yach> kar = k.openSetCells(kartaFile);
     for(yach ya: kar) {
       r = ya.irow - 1;
       c = ya.icol - 1;
       Cell cc = einp.getCell(r, c); //
-      int type = cc.getCellType();  // тип ячейки
-      switch (type) {
+      switch (cc.getCellType()) { // тип ячейки
         // строка
         case Cell.CELL_TYPE_STRING:
           str = cc.getStringCellValue();
