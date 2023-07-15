@@ -18,11 +18,6 @@ import java.util.Set;
 public class karta {
   HashSet<yach> f_set;    // набор множества ячеек
 
-  karta()
-  {
-    f_set = new HashSet<>();
-  }
-
   /**
    * прочитать файл с картой и запомнить ячейки в множестве ячеек yach
    * @param fileName  имя файла
@@ -31,7 +26,7 @@ public class karta {
   Set<yach> openSetYach(String fileName)
   {
     try {
-      f_set.clear();
+      f_set = new HashSet<>();
       BufferedReader rdr = new BufferedReader(new FileReader(fileName));
       String str;
       while( (str = rdr.readLine()) != null ) {
@@ -40,9 +35,6 @@ public class karta {
           Set<yach> setYach = ya.set(str);
           if(setYach != null)
             f_set.addAll(setYach);
-//          if (ya.set(str)) {
-//            f_set.add(ya);
-//          }
         }
       }
       //
