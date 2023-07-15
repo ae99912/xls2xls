@@ -38,7 +38,7 @@ class yach {
 
   /**
    * преобразовать строку с ячейкой(ами) в набор ячеек
-   * @param kartCellStr  строка с ячейкой (A21) или диапазоном (C2:D40)
+   * @param kartCellStr  строка с ячейкой (C2) или диапазоном (C2:D40)
    * @return набор ячеек
    */
   public Set<yach> set(String kartCellStr)
@@ -47,7 +47,7 @@ class yach {
     if( sss.length() < 1 )
       return null;
     //
-    HashSet<yach> yset = new HashSet<>();
+    HashSet<yach> yaSet = new HashSet<>();
     try {
       Matcher mat = cell_pattern.matcher(sss);
       if (!mat.find()) {
@@ -61,9 +61,9 @@ class yach {
       this.icol = c1;
       this.irow = r1;
       this.name = kartCellStr;
-      yset.add(this);
+      yaSet.add(this);
       if (!mat.find())
-        return yset;
+        return yaSet;
       // есть вторая ячейка, значит диапазон
       int c2 = getExcelColumnNumber(mat.group(1));
       int r2 = Integer.parseInt(mat.group(2));
@@ -78,15 +78,15 @@ class yach {
       }
       for (int ic = c1; ic <= c2; ic++) {
         for (int jr = r1; jr <= r2; jr++) {
-          yach yy = new yach(jr, ic, kartCellStr);
-          yset.add(yy);
+          yach ya = new yach(jr, ic, kartCellStr);
+          yaSet.add(ya);
         }
       }
     } catch (Exception e) {
       System.err.println("?-Error-cell.setAll('" + kartCellStr + "') error conversion: " + e.getMessage());
       return null;
     }
-    return yset;
+    return yaSet;
   }
 
   @Override
