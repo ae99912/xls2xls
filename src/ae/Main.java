@@ -3,7 +3,7 @@
  * Copyright (c) 2023. AE
  * 2023-07-11
  *
- * копирование значений ячеек (не пустых) из одного файла Excel в другой
+ * копирование значений ячеек (не пустых) из одного файла Excel 2010 в другой
  * на основе карты переноса
  */
 
@@ -25,10 +25,14 @@ public class Main {
 
       switch (key) {
         case "-?":
-          System.out.println("Help about programm");
-          System.out.println("xls2xls karta.txt Input.XLSX Output.XLSX");
+          System.out.println("Help about program:");
+          System.out.println("> xls2xls [-v]  Karta.txt  Input.XLSX  Output.XLSX");
           return;
           //break;
+
+        case "-v":  // отладочный вывод
+          R.debug = true;
+          break;
 
         default:
           // параметр входной строки
@@ -36,7 +40,7 @@ public class Main {
           break;
       }
     }
-    if (ai < 3)  {
+    if ( ai < 3 )  {
       System.err.println("Неправильный формат командной строки. Смотри -?");
       return;
     }

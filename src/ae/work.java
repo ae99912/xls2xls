@@ -5,11 +5,11 @@
 /*
   обработка данных
  */
-package ae;
 
 /*
   Работа над Excel
  */
+package ae;
 
 import org.apache.poi.ss.usermodel.Cell;
 import java.util.Set;
@@ -18,46 +18,26 @@ public class work {
 
   int up(String kartaFile, String inpFile, String outFile)
   {
-    excel einp = new excel(inpFile, 0);
-    excel eout = new excel(outFile, 0);
+    excel eInp = new excel(inpFile, 0);
+    excel eOut = new excel(outFile, 0);
     int count = 0;
-    String str;
-    Double dbl;
-    int r, c;
     // карта ячеек для копирования
     karta k = new karta();
-    Set<yach> kar = k.openSetCells(kartaFile);
+    Set<yach> kar = k.openSetYach(kartaFile);
     for(yach ya: kar) {
-      r = ya.irow - 1;
-      c = ya.icol - 1;
-      Cell cc = einp.getCell(r, c); //
-      switch (cc.getCellType()) { // тип ячейки
-        // строка
-        case Cell.CELL_TYPE_STRING:
-          str = cc.getStringCellValue();
-          if( str != null && str.length() > 0) {
-            eout.setCellVal(r, c, str);
-            count++;
-          }
-          break;
-
-        // число
-        case Cell.CELL_TYPE_NUMERIC:
-          dbl = cc.getNumericCellValue();
-          if( dbl != null ) {
-            eout.setCellVal(r, c, dbl);
-            count++;
-          }
-          break;
-      }
-      //
-    } // end for
-
+      int r = ya.irow - 1;
+      int c = ya.icol - 1;
+      Cell cc = eInp.getCell(r, c); //
+      if(eOut.setCellVal(r, c, cc))
+        count++;
+    }
     //
-    eout.write(outFile);
-    einp.close();
-    eout.close();
-
+    if( !eOut.write(outFile) ) {
+      System.err.println("?-Error-don't write: " + outFile);
+    }
+    eInp.close();
+    eOut.close();
+    //
     return count;
   }
 

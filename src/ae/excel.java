@@ -1,10 +1,11 @@
 /*
  * Copyright (c) 2023. AE
  */
-package ae;
+
 /*
  Книга Excel, на основе файла на диске
  */
+package ae;
 
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
@@ -16,19 +17,19 @@ import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class excel {
   //
-  Workbook      f_wbk       = null;
-  Sheet         f_sheet     = null;
-  String        f_filename  = null;
+  Workbook      f_wbk       = null;   // workbook Excel рабочая книга
+  Sheet         f_sheet     = null;   // sheet Excel рабочий лист
 
   excel(String fileName, int numSheet)
   {
-    open(fileName, numSheet);
+    if( !open(fileName, numSheet) )
+      System.err.println("?-Error-excel don't open");
   }
 
   /**
    * открыть файл Excel
-   * @param fileName  - имя файла
-   * @param numSheet  - номер листа, с которым работаем
+   * @param fileName  имя файла
+   * @param numSheet  номер листа, с которым работаем
    * @return true - открыто, false - не открыто
    */
   boolean open(String fileName, int numSheet)
@@ -52,21 +53,6 @@ public class excel {
     return true;
   }
 
-//  /**
-//   * копировать входной файл во временный файл
-//   * @param fileName  - имя входного файла
-//   * @return  временный файл
-//   * @throws Exception
-//   */
-//  File copyToTmp(String fileName) throws Exception
-//  {
-//    File tempFile = File.createTempFile("x2x",".tmp");
-//    tempFile.deleteOnExit();  // удалить при завершении приложения
-//    File source = new File(fileName);
-//    Files.copy(source.toPath(), tempFile.toPath(), REPLACE_EXISTING);
-//    return tempFile;
-//  }
-
   void close()
   {
     if(f_wbk != null) {
@@ -80,6 +66,11 @@ public class excel {
     }
   }
 
+  /**
+   * записать рабочую книгу Excel в выходной файл
+   * @param fileName  имя выходного файла
+   * @return результат записи (true - записан, false - нет)
+   */
   boolean write(String fileName)
   {
     if(f_wbk == null) {
@@ -101,70 +92,117 @@ public class excel {
         // копирование файла
         // https://javadevblog.com/kak-skopirovat-fajl-v-java-4-sposoba-primery-i-kod.html
         Files.copy(tempFile.toPath(), f.toPath(), REPLACE_EXISTING);
+        return true;
       }
     } catch (Exception e) {
       System.err.println("?-Error-excel.write('" + fileName +"') " + e.getMessage());
       return false;
     }
-    return true;
+    return false;
   }
 
-  /**
-   * выполним принудительно перерасчет всех формул в рабочей книге
-   */
-  void calculate()
-  {
-    if(f_wbk == null) {
-      System.err.println("?-Error-excel.calculate() don't open Excel");
-    }
-    // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
-    // перерасчет всех формул на листе
-    // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
-    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
-    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
-  }
+//  /**
+//   * выполним принудительно перерасчет всех формул в рабочей книге
+//   */
+//  void calculate()
+//  {
+//    if(f_wbk == null) {
+//      System.err.println("?-Error-excel.calculate() don't open Excel");
+//    }
+//    // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
+//    // перерасчет всех формул на листе
+//    // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
+//    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
+//    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
+//  }
+
+//  /**
+//   * Установить числовое значение ячейки в заданной строке таблицы
+//   * @param irow    строка
+//   * @param icol    номер колонки
+//   * @param val     устанавливаемое значения (numeric)
+//   * @return      1 - значение установлено, 0 - не установлено
+//   */
+//  boolean setCellVal(int irow, int icol, Double val)
+//  {
+//    try {
+//      Cell c = getCell(irow, icol);
+//      if(c == null)
+//        return false;
+//      c.setCellValue(val);  // Access the cell
+//    } catch (Exception e) {
+//      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + val + ")-error set value. " + e.getMessage());
+//      return false;
+//    }
+//    return true;
+//  }
+//
+//  /**
+//   * Установить строковое значение ячейки в заданной строке таблицы
+//   * @param irow    строка
+//   * @param icol    колонка
+//   * @param val     устанавливаемое значения (String)
+//   * @return      1 - значение установлено, 0 - не установлено
+//   */
+//  boolean setCellVal(int irow, int icol, String val)
+//  {
+//    try {
+//      Cell c = getCell(irow, icol);
+//      if(c == null)
+//        return false;
+//      c.setCellValue(val);  // Access the cell
+//    } catch (Exception e) {
+//      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + val + ")-error set value. " + e.getMessage());
+//      return false;
+//    }
+//    return true;
+//  }
 
   /**
-   * Установить числовое значение ячейки в заданной строке таблицы
-   * @param irow    строка
-   * @param icol    номер колонки
-   * @param val     устанавливаемое значения (numeric)
-   * @return      1 - значение установлено, 0 - не установлено
+   * записать в ячейку значение: строковое или числовое
+   * @param irow  строка
+   * @param icol  колонка
+   * @param cell  ячейка, откуда берется значение
+   * @return  результат записи - было записано значение или нет
    */
-  boolean setCellVal(int irow, int icol, Double val)
+  boolean setCellVal(int irow, int icol, Cell cell)
   {
     try {
+      if(R.debug) System.out.println("setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
+
       Cell c = getCell(irow, icol);
       if(c == null)
         return false;
-      c.setCellValue(val);  // Access the cell
+      switch (cell.getCellType()) { // тип ячейки
+        // строка
+        case Cell.CELL_TYPE_STRING:
+          String str = cell.getStringCellValue();
+          if( str != null && str.length() > 0) {
+            c.setCellValue(str);
+            return true;
+          }
+          break;
+
+        // число
+        case Cell.CELL_TYPE_NUMERIC:
+          double dbl = cell.getNumericCellValue();
+          c.setCellValue(dbl);
+          return true;
+          // break;
+
+        // логическое
+        case Cell.CELL_TYPE_BOOLEAN:
+          boolean bol = cell.getBooleanCellValue();
+          c.setCellValue(bol);
+          return true;
+      }
     } catch (Exception e) {
-      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + val + ")-error set value. " + e.getMessage());
+      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")-error set value. " + e.getMessage());
       return false;
     }
-    return true;
+    return false;
   }
 
-  /**
-   * Установить строковое значение ячейки в заданной строке таблицы
-   * @param irow    строка
-   * @param icol    колонка
-   * @param val     устанавливаемое значения (String)
-   * @return      1 - значение установлено, 0 - не установлено
-   */
-  boolean setCellVal(int irow, int icol, String val)
-  {
-    try {
-      Cell c = getCell(irow, icol);
-      if(c == null)
-        return false;
-      c.setCellValue(val);  // Access the cell
-    } catch (Exception e) {
-      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + val + ")-error set value. " + e.getMessage());
-      return false;
-    }
-    return true;
-  }
 
   /**
    * Получить ячейки в строке в заданной колонке
@@ -226,5 +264,26 @@ public class excel {
 //    }
 //    return dbl;
 //  }
+
+  public static String  getCellStrValue(Cell cell)
+  {
+    if(cell == null)
+      return "null";
+    switch (cell.getCellType()) { // тип ячейки
+      // строка
+      case Cell.CELL_TYPE_STRING:
+        return "'" + cell.getStringCellValue() + "'";
+
+      // число
+      case Cell.CELL_TYPE_NUMERIC:
+        return "" + cell.getNumericCellValue();
+      // break;
+
+      case Cell.CELL_TYPE_BOOLEAN:
+        return "" + cell.getBooleanCellValue();
+    }
+    return "<...>";
+  }
+
 
 } // end of class

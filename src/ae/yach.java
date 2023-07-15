@@ -13,21 +13,23 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 class yach {
-  // паттерн для имени ячейки A12, B3 ...
-  final static Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");
+  final static Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");  // паттерн для имени ячейки A12, B3 ...
   int irow;       // номер строки  1 - 1
   int icol;       // номер столбца A - 1
   String  name;   // имя ячейки (для справки, по программе не нужно)
 
   /**
    * установить номера строки и столбца по строке с именем ячейки
-   * @param kartCellStr - название ячейки (A1, B12 и т.д.)
+   * @param kartCellStr  название ячейки (A1, B12 и т.д.)
    * @return  значение установлено
    */
   boolean set(String kartCellStr)
   {
     try {
-      Matcher mat = cell_pattern.matcher(kartCellStr.toUpperCase());
+      String s = kartCellStr.toUpperCase().replaceAll ("\\s", "");
+      if( s.length() < 1 )
+        return false;
+      Matcher mat = cell_pattern.matcher(s);
       if(!mat.find()) {
         throw new NumberFormatException("not found cell name");
       }
@@ -38,12 +40,28 @@ class yach {
       }
       this.icol = c;
       this.irow = r;
-      this.name = kartCellStr;  // справочная инфа
+      this.name = s;  // справочная инфа
     } catch (Exception e) {
       System.err.println("?-Error-cell.set('" + kartCellStr + "') error conversion: " + e.getMessage());
       return false;
     }
     return true;
+  }
+
+  @Override
+  public boolean equals(Object o) {
+    // https://javarush.com/groups/posts/2179-metodih-equals--hashcode-praktika-ispoljhzovanija
+    if (getClass() != o.getClass())
+      return false;
+    yach yo = (yach)o;
+    return this.icol == yo.icol  && this.irow == yo.irow;
+  }
+
+  @Override
+  public  int hashCode() {
+    // https://javarush.com/groups/posts/2179-metodih-equals--hashcode-praktika-ispoljhzovanija
+    String s = this.icol + "," + this.irow;
+    return s.hashCode();
   }
 
   /**

@@ -11,13 +11,11 @@
 package ae;
 
 import java.io.BufferedReader;
-import java.io.File;
 import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Set;
 
 public class karta {
-  String    f_filename;   // имя файла карты
   HashSet<yach> f_set;    // набор множества ячеек
 
   karta()
@@ -27,17 +25,14 @@ public class karta {
 
   /**
    * прочитать файл с картой и запомнить ячейки в множестве ячеек yach
-   * @param fileName  - имя файла
+   * @param fileName  имя файла
    * @return набор (множество) ячеек карты
    */
-  Set<yach> openSetCells(String fileName)
+  Set<yach> openSetYach(String fileName)
   {
     try {
-      f_filename = fileName;  // для информации
       f_set.clear();
-      File f = new File(fileName);
-      FileReader fire = new FileReader(f);
-      BufferedReader rdr = new BufferedReader(fire);
+      BufferedReader rdr = new BufferedReader(new FileReader(fileName));
       String str;
       while( (str = rdr.readLine()) != null ) {
         if( str.length() > 1 && str.charAt(0) != '#' ) {
