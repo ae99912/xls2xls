@@ -37,9 +37,12 @@ public class karta {
       while( (str = rdr.readLine()) != null ) {
         if( str.length() > 1 && str.charAt(0) != '#' ) {
           yach ya = new yach();
-          if (ya.set(str)) {
-            f_set.add(ya);
-          }
+          Set<yach> setYach = ya.set(str);
+          if(setYach != null)
+            f_set.addAll(setYach);
+//          if (ya.set(str)) {
+//            f_set.add(ya);
+//          }
         }
       }
       //

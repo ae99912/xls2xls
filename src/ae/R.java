@@ -10,15 +10,16 @@ package ae;
  13.07.23 определил карту переноса в виде текстового файла
  14.07.23 запись Excel через временный файл
  15.07.23 уникальность ячеек в наборе при чтении карты (yach.hashCode)
+ 15.07.23 задание диапазона ячеек (например, C7:F11)
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 1.3"; // номер версии
+    public final static String Ver = "Ver. 1.4"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
-    static boolean debug = true;   // отладочный вывод
+    static boolean debug = false;   // отладочный вывод
 //    /**
 //     * загрузка значений параметров по-умолчанию из файла res/default.properties
 //     * Порядок определения каталогов:
