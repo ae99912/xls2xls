@@ -11,11 +11,12 @@ package ae;
  14.07.23 запись Excel через временный файл
  15.07.23 уникальность ячеек в наборе при чтении карты (yach.hashCode)
  15.07.23 задание диапазона ячеек (например, C7:F11)
+ 16.07.23 разбор строки с ячейками перенес в класс karta
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 1.4"; // номер версии
+    public final static String Ver = "Ver. 1.5"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

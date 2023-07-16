@@ -14,8 +14,13 @@ import java.io.BufferedReader;
 import java.io.FileReader;
 import java.util.HashSet;
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class karta {
+  // паттерн для имени ячейки
+  final private static Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");  // паттерн для имени ячейки A12, B3 ...
+
   HashSet<yach> f_set;    // набор множества ячеек
 
   /**
@@ -31,10 +36,7 @@ public class karta {
       String str;
       while( (str = rdr.readLine()) != null ) {
         if( str.length() > 1 && str.charAt(0) != '#' ) {
-          yach ya = new yach();
-          Set<yach> setYach = ya.set(str);
-          if(setYach != null)
-            f_set.addAll(setYach);
+          addStrKart(str);
         }
       }
       //
@@ -43,6 +45,61 @@ public class karta {
       return null;
     }
     return f_set;
+  }
+
+
+  /**
+   * добавить в множество ячеек ячейки из строки карты как имя отдельной ячейки или диапазона ячеек
+   * @param strKart   строка карты переноса
+   */
+  private void addStrKart(String strKart)
+  {
+
+    String sss = strKart.toUpperCase().replaceAll ("\\s", "");
+    if( sss.length() < 1 )
+      return;
+    //
+    try {
+      Matcher mat = cell_pattern.matcher(sss);
+      if (!mat.find()) {
+        throw new NumberFormatException("not found cell name");
+      }
+      int c1 = getExcelColumnNumber(mat.group(1));
+      int r1 = Integer.parseInt(mat.group(2));
+      // добавим первую ячейку, неважно одна или диапазон
+      this.f_set.add(new yach(r1, c1, strKart));
+      //
+      // проверим - есть еще ячейка в строке, если есть значит диапазон
+      if (!mat.find())
+        return;
+      // есть вторая ячейка, значит диапазон
+      int c2 = getExcelColumnNumber(mat.group(1));
+      int r2 = Integer.parseInt(mat.group(2));
+      // заполним диапазон от края до края
+      for (int ic = Math.min(c1,c2); ic <= Math.max(c1,c2); ic++) {
+        for (int jr = Math.min(r1,r2); jr <= Math.max(r1,r2); jr++) {
+          // добавим ячейку в набор
+          this.f_set.add(new yach(jr, ic, strKart));
+        }
+      }
+    } catch (Exception e) {
+      System.err.println("?-Error-" + getClass() +".addStrKart('" + strKart + "') error conversion: " + e.getMessage());
+    }
+  }
+
+  /**
+   * преобразовать имя столбца Excel в его номер
+   * @param column - строка имени столбца
+   * @return номер столбца
+   */
+  private static int getExcelColumnNumber(String column)
+  {
+    int result = 0;
+    for(int i = 0; i < column.length(); i++) {
+      result *= 26;
+      result += column.charAt(i) - 'A' + 1;
+    }
+    return result;
   }
 
 } // end of class

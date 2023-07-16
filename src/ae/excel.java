@@ -23,7 +23,7 @@ public class excel {
   excel(String fileName, int numSheet)
   {
     if( !open(fileName, numSheet) )
-      System.err.println("?-Error-excel don't open");
+      System.err.println("?-Error-" + getClass() + ".excel() don't open");
   }
 
   /**
@@ -35,7 +35,7 @@ public class excel {
   boolean open(String fileName, int numSheet)
   {
     if(f_wbk != null) {
-      System.err.println("?-Error-excel.open('" + fileName + "') yet open Excel");
+      System.err.println("?-Error-" + getClass() + "excel.open('" + fileName + "') yet open Excel");
       return false;
     }
     try {
@@ -45,7 +45,7 @@ public class excel {
       inp.close();
       f_sheet = f_wbk.getSheetAt(numSheet); //Access the worksheet, so that we can update / modify it.
     } catch (Exception e) {
-      System.err.println("?-Error-excel.open('" + fileName + "', " +numSheet +")  " + e.getMessage());
+      System.err.println("?-Error-" + getClass() + "excel.open('" + fileName + "', " +numSheet +")  " + e.getMessage());
       f_sheet = null;
       f_wbk   = null;
       return false;
@@ -59,7 +59,7 @@ public class excel {
       try {
         f_wbk.close();
       } catch (Exception e) {
-        System.err.println("?-Error-excel.close()  " + e.getMessage());
+        System.err.println("?-Error-" + getClass() + ".close()  " + e.getMessage());
       }
       f_wbk = null;
       f_sheet = null;
@@ -74,7 +74,7 @@ public class excel {
   boolean write(String fileName)
   {
     if(f_wbk == null) {
-      System.err.println("?-Error-excel.write('" + fileName + "') don't open Excel");
+      System.err.println("?-Error-" + getClass() + ".write('" + fileName + "') don't open Excel");
       return false;
     }
     try {
@@ -95,7 +95,7 @@ public class excel {
         return true;
       }
     } catch (Exception e) {
-      System.err.println("?-Error-excel.write('" + fileName +"') " + e.getMessage());
+      System.err.println("?-Error-" + getClass() + ".write('" + fileName +"') " + e.getMessage());
       return false;
     }
     return false;
@@ -197,7 +197,7 @@ public class excel {
           return true;
       }
     } catch (Exception e) {
-      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")-error set value. " + e.getMessage());
+      System.err.println("?-Warning-" + getClass() + ".setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")-error set value. " + e.getMessage());
       return false;
     }
     return false;
@@ -213,7 +213,7 @@ public class excel {
   Cell getCell(int irow, int icol)
   {
     if(f_sheet == null) {
-      System.err.println("?-Error-excel.getCell(" + irow + "," + icol + ")  don't open Excel.");
+      System.err.println("?-Error-" + getClass() + ".getCell(" + irow + "," + icol + ")  don't open Excel.");
       return null;
     }
     Cell c;
@@ -224,7 +224,7 @@ public class excel {
         c = row.createCell(icol); // создадим ячейку
       }
     } catch (Exception e) {
-      System.err.println("?-Error-getCell(" + irow + "," + icol  + ") " + e.getMessage());
+      System.err.println("?-Error-" + getClass() + ".getCell(" + irow + "," + icol  + ") " + e.getMessage());
       return null;
     }
     return c;
