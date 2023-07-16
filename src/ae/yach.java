@@ -16,11 +16,11 @@ class yach {
 
   /**
    * установить значения
-   * @param iCol  колонка
    * @param iRow  строка
+   * @param iCol  колонка
    * @param Name  имя
    */
-  yach(int iRow,int iCol,  String Name)
+  yach(int iRow, int iCol,  String Name)
   {
     set(iRow, iCol, Name);
   }

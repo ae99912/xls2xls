@@ -13,6 +13,10 @@ Modify
 
 package ae;
 
+import org.apache.poi.ss.usermodel.Cell;
+
+import java.util.Set;
+
 public class Main {
   public static void main(String[] args) {
     System.out.println("xls2xls " + R.Ver);
@@ -45,12 +49,35 @@ public class Main {
       return;
     }
     //
-    work w = new work();
-    int cnt;
     // начнем обработку
-    cnt = w.up(aaa[0], aaa[1], aaa[2]);
     //
-    System.out.println("Записано ячеек: " + cnt);
+    String kartaFile  = aaa[0];
+    String inpFile    = aaa[1];
+    String outFile    = aaa[2];
+    //
+    // объекты Excel
+    excel eInp = new excel(inpFile, 0);
+    excel eOut = new excel(outFile, 0);
+    int count = 0;
+    // карта ячеек для копирования
+    karta k = new karta();
+    Set<yach> kar = k.openSetYach(kartaFile);
+    for(yach ya: kar) {
+      int r = ya.irow - 1;
+      int c = ya.icol - 1;
+      Cell cell = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
+      if(eOut.setCellVal(r, c, cell))   // поместим ячейку в выходной Excel
+        count++;  // считаем переносы значений
+    }
+    //
+    if( !eOut.write(outFile) ) {
+      System.err.println("?-Error-don't write: " + outFile);
+    }
+    eInp.close();
+    eOut.close();
+
+    System.out.println("Записано ячеек: " + count);
+    //
   }
 
 }
