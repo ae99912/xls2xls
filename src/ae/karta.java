@@ -19,16 +19,16 @@ import java.util.regex.Pattern;
 
 public class karta {
   // паттерн для имени ячейки
-  final private static Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");  // паттерн для имени ячейки A12, B3 ...
+  final private Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");  // паттерн для имени ячейки A12, B3 ...
 
   HashSet<yach> f_set;    // набор множества ячеек
 
   /**
-   * прочитать файл с картой и запомнить ячейки в множестве ячеек yach
+   * открыть и прочитать файл с картой и запомнить ячейки в множестве ячеек yach
    * @param fileName  имя файла
    * @return набор (множество) ячеек карты
    */
-  Set<yach> openSetYach(String fileName)
+  Set<yach> open(String fileName)
   {
     try {
       f_set = new HashSet<>();
@@ -36,7 +36,7 @@ public class karta {
       String str;
       while( (str = rdr.readLine()) != null ) {
         if( str.length() > 1 && str.charAt(0) != '#' ) {
-          addStrKart(str);
+          addStr(str);
         }
       }
       //
@@ -47,12 +47,11 @@ public class karta {
     return f_set;
   }
 
-
   /**
    * добавить в множество ячеек ячейки из строки карты как имя отдельной ячейки или диапазона ячеек
    * @param strKart   строка карты переноса
    */
-  private void addStrKart(String strKart)
+  private void addStr(String strKart)
   {
 
     String sss = strKart.toUpperCase().replaceAll ("\\s", "");
@@ -75,9 +74,13 @@ public class karta {
       // есть вторая ячейка, значит диапазон
       int c2 = getExcelColumnNumber(mat.group(1));
       int r2 = Integer.parseInt(mat.group(2));
+      // при задании диапазона правая граница д.б. больше левой
+      if( c2 < c1 || r2 < r1 ) {
+        throw new NumberFormatException("right less that left");
+      }
       // заполним диапазон от края до края
-      for (int ic = Math.min(c1,c2); ic <= Math.max(c1,c2); ic++) {
-        for (int jr = Math.min(r1,r2); jr <= Math.max(r1,r2); jr++) {
+      for (int ic = c1; ic <= c2; ic++) {
+        for (int jr = r1; jr <= r2; jr++) {
           // добавим ячейку в набор
           this.f_set.add(new yach(jr, ic, strKart));
         }

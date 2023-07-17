@@ -27,11 +27,12 @@ class yach {
 
   void set(int iRow,int iCol,  String Name) throws NumberFormatException
   {
-    if ( iRow < 1 || iCol <1 )
+    if ( iRow < 1 || iCol <1 ) {
       throw new NumberFormatException("number less 1");
+    }
     this.irow = iRow;
     this.icol = iCol;
-    this.name = Name;
+    if(R.debug) this.name = Name;   // имя ячейки (строка карты) только для отладки
   }
 
   /**

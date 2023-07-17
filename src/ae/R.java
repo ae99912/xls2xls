@@ -13,11 +13,12 @@ package ae;
  15.07.23 задание диапазона ячеек (например, C7:F11)
  16.07.23 разбор строки с ячейками перенес в класс karta
  16.07.23 убрал класс work, работаем в Main
+ 17.07.23 при задании диапазона правая граница д.б. больше левой
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 1.6"; // номер версии
+    public final static String Ver = "Ver. 1.7"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

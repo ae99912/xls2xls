@@ -4,7 +4,12 @@
  * 2023-07-11
  *
  * копирование значений ячеек (не пустых) из одного файла Excel 2010 в другой
- * на основе карты переноса
+ * на основе карты переноса:
+ *   # пример карты
+ *   C53:F56
+ *   C53
+ *   C99:F99
+ *   C110:F110
  */
 
 /*
@@ -61,7 +66,7 @@ public class Main {
     int count = 0;
     // карта ячеек для копирования
     karta k = new karta();
-    Set<yach> kar = k.openSetYach(kartaFile);
+    Set<yach> kar = k.open(kartaFile);
     for(yach ya: kar) {
       int r = ya.irow - 1;
       int c = ya.icol - 1;

@@ -22,37 +22,62 @@ public class excel {
 
   excel(String fileName, int numSheet)
   {
-    if( !open(fileName, numSheet) )
-      System.err.println("?-Error-" + getClass() + ".excel() don't open");
+    if( open(fileName) ) {
+      if( !openSheet(numSheet) ) {
+        System.err.println("?-Error-" + getClass() + ".excel() don't open worksheet");
+      }
+    } else {
+      System.err.println("?-Error-" + getClass() + ".excel() don't open workbook");
+    }
   }
 
   /**
-   * открыть файл Excel
+   * открыть рабочую книгу Excel
    * @param fileName  имя файла
-   * @param numSheet  номер листа, с которым работаем
    * @return true - открыто, false - не открыто
    */
-  boolean open(String fileName, int numSheet)
+  boolean open(String fileName)
   {
     if(f_wbk != null) {
-      System.err.println("?-Error-" + getClass() + "excel.open('" + fileName + "') yet open Excel");
+      System.err.println("?-Warning-" + getClass() + "open('" + fileName + "') workbook already open");
       return false;
     }
     try {
+      f_sheet = null;
       // File tmpFile = copyToTmp(fileName);
       FileInputStream inp = new FileInputStream(fileName);
       f_wbk = new XSSFWorkbook(inp); // прочитать файл с Excel 2010
       inp.close();
-      f_sheet = f_wbk.getSheetAt(numSheet); //Access the worksheet, so that we can update / modify it.
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + "excel.open('" + fileName + "', " +numSheet +")  " + e.getMessage());
-      f_sheet = null;
-      f_wbk   = null;
+      System.err.println("?-Error-" + getClass() + "open('" + fileName + "')  " + e.getMessage());
       return false;
     }
     return true;
   }
 
+  /**
+   * открыть лист в Excel
+   * @param numSheet  индекс листа
+   * @return результат true - лист открыт, false - не открыт
+   */
+  boolean openSheet(int numSheet)
+  {
+    if(f_wbk == null) {
+      System.err.println("?-Warning-" + getClass() + "openSheet('" + numSheet + "') don't open workbook");
+      return false;
+    }
+    try {
+      f_sheet = f_wbk.getSheetAt(numSheet); //Access the worksheet, so that we can update / modify it.
+    } catch (Exception e) {
+      System.err.println("?-Error-" + getClass() + "openSheet('" + numSheet + ")  " + e.getMessage());
+      f_sheet = null;
+      return false;
+    }
+    return true;
+  }
+  /**
+   * закрыть объект
+   */
   void close()
   {
     if(f_wbk != null) {
@@ -205,7 +230,7 @@ public class excel {
 
 
   /**
-   * Получить ячейки в строке в заданной колонке
+   * Получить ячейку в строке в заданной колонке
    * @param irow   строка
    * @param icol   колонка
    * @return  ячейка, null - нет ячейки
@@ -213,7 +238,7 @@ public class excel {
   Cell getCell(int irow, int icol)
   {
     if(f_sheet == null) {
-      System.err.println("?-Error-" + getClass() + ".getCell(" + irow + "," + icol + ")  don't open Excel.");
+      System.err.println("?-Error-" + getClass() + ".getCell(" + irow + "," + icol + ")  don't open sheet.");
       return null;
     }
     Cell c;
@@ -284,6 +309,5 @@ public class excel {
     }
     return "<...>";
   }
-
 
 } // end of class
