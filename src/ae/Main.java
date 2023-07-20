@@ -68,8 +68,8 @@ public class Main {
     karta k = new karta();
     Set<yach> kar = k.open(kartaFile);
     for(yach ya: kar) {
-      int r = ya.irow - 1;
-      int c = ya.icol - 1;
+      int r = ya.irow - 1;    // индекс строки ячейки
+      int c = ya.icol - 1;    // индекс столбца ячейки
       Cell cell = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
       if(eOut.setCellVal(r, c, cell))   // поместим ячейку в выходной Excel
         count++;  // считаем переносы значений
