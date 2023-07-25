@@ -61,19 +61,16 @@ GOTO :EOF
 :mkwork
 rem обработка регионального файла
 echo ========================================================
-rem echo Region %1
-set FIL="%OutDIR%\%1_ПФО Форма отчета Android VPN"
-set XLSX=0
-for %%I in (%FIL%*.xlsx) do set XLSX=%%I%
-IF exist "%XLSX%" goto w1
-echo No file for Region %1
-goto :EOF
-:w1
-echo Region %1 file exist - %XLSX%
-java -jar %MYJAR% %KARTA%%1.txt "%XLSX%"  "%Outxlsx%"
-java -jar %MYJAR% %KARTA%%1.txt "%XLSX%"  "%OutIxlsx%" >%tmplog%
-move "%XLSX%" %ArchDir%\
-goto :EOF
+for %%I in (%OutDIR%\%1_*.xlsx) do call :wowo %1 "%%I%"
+goto :eof
+
+
+:wowo
+echo Region %1 file exist - %2
+java -jar %MYJAR% %KARTA%%1.txt  %2  "%Outxlsx%"
+java -jar %MYJAR% %KARTA%%1.txt  %2  "%OutIxlsx%" 
+rem   move "%%I%"  %ArchDir%\   
+goto :eof
 
 
 :makeBak
