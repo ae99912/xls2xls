@@ -7,6 +7,8 @@
   ячейки задаются в текстовом файле по одной ячейке в строке
   строка, начинающаяся с # - комментарий
 
+  23.10.23 добавим к карте свойство (prop), пусть они начинаются с @
+           первым свойством будет @only01 - читать только 0 и 1
  */
 package ae;
 
@@ -21,7 +23,14 @@ public class karta {
   // паттерн для имени ячейки
   final private Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");  // паттерн для имени ячейки A12, B3 ...
 
-  HashSet<yach> f_set;    // набор множества ячеек
+  HashSet<yach> f_set;      // набор множества ячеек
+  HashSet<String> f_prop;   // набор свойств
+
+  karta()
+  {
+    f_set = new HashSet<>();
+    f_prop = new HashSet<>();
+  }
 
   /**
    * открыть и прочитать файл с картой и запомнить ячейки в множестве ячеек yach
@@ -31,12 +40,22 @@ public class karta {
   Set<yach> open(String fileName)
   {
     try {
-      f_set = new HashSet<>();
-      BufferedReader rdr = new BufferedReader(new FileReader(fileName));
+     BufferedReader rdr = new BufferedReader(new FileReader(fileName));
       String str;
       while( (str = rdr.readLine()) != null ) {
-        if( str.length() > 1 && str.charAt(0) != '#' ) {
-          addStr(str);
+        if(str.length() > 1) {
+          switch (str.charAt(0)) {
+            case '#':   // комментарий
+              break;
+
+            case '@':   // свойство
+              f_prop.add(str.substring(1));
+              break;
+
+            default:    // ячейка
+              addStr(str);
+              break;
+          }
         }
       }
       //
@@ -88,6 +107,16 @@ public class karta {
     } catch (Exception e) {
       System.err.println("?-Error-" + getClass() +".addStrKart('" + strKart + "') error conversion: " + e.getMessage());
     }
+  }
+
+  /**
+   * Проверить есть ли указанное свойтство.
+   * @param sProp - имя свойства
+   * @return  есть - true, нет - false
+   */
+  boolean isProp(String sProp)
+  {
+    return f_prop.contains(sProp);
   }
 
   /**

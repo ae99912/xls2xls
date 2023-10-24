@@ -278,17 +278,17 @@ public class excel {
 //    return str;
 //  }
 //
-//  Double getCellNumeric(int irow, int icol)
-//  {
-//    Double dbl = null;
-//    Cell c = getCell(irow, icol);
-//    if(c != null) {
-//      if (c.getCellType() == Cell.CELL_TYPE_NUMERIC) {  // numeric 0
-//        dbl = c.getNumericCellValue();
-//      }
-//    }
-//    return dbl;
-//  }
+  Double getCellNumeric(int irow, int icol)
+  {
+    Double dbl = null;
+    Cell c = getCell(irow, icol);
+    if(c != null) {
+      if (c.getCellType() == Cell.CELL_TYPE_NUMERIC) {  // numeric 0
+        dbl = c.getNumericCellValue();
+      }
+    }
+    return dbl;
+  }
 
   public static String  getCellStrValue(Cell cell)
   {
