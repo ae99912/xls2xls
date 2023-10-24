@@ -86,7 +86,7 @@ public class excel {
       } catch (Exception e) {
         System.err.println("?-Error-" + getClass() + ".close()  " + e.getMessage());
       }
-      f_wbk = null;
+      f_wbk   = null;
       f_sheet = null;
     }
   }
@@ -108,11 +108,11 @@ public class excel {
       // сначала запишем Excel во временный файл
       File tempFile = File.createTempFile("x2x",".tmp");
       tempFile.deleteOnExit();  // удалить при завершении приложения
-      FileOutputStream fto = new FileOutputStream(tempFile);
-      f_wbk.write(fto);
-      fto.close();
+      FileOutputStream ftmpout = new FileOutputStream(tempFile);
+      f_wbk.write(ftmpout);
+      ftmpout.close();
       // если после записи во временный файл его длина больше 1 кБ, то запишем в выходной файл
-      if ( tempFile.length() > 1024 ) {
+      if(tempFile.length() > 1024) {
         File f = new File(fileName);
         // копирование файла
         // https://javadevblog.com/kak-skopirovat-fajl-v-java-4-sposoba-primery-i-kod.html
@@ -228,7 +228,6 @@ public class excel {
     return false;
   }
 
-
   /**
    * Получить ячейку в строке в заданной колонке
    * @param irow   строка
@@ -278,6 +277,13 @@ public class excel {
 //    return str;
 //  }
 //
+
+  /**
+   * Получить из ячейки число
+   * @param irow  строка
+   * @param icol  колонка
+   * @return действительное число, если ячейка есть и в ней число, либо null
+   */
   Double getCellNumeric(int irow, int icol)
   {
     Double dbl = null;

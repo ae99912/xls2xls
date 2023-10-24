@@ -32,20 +32,20 @@ class yach {
     }
     this.irow = iRow;
     this.icol = iCol;
-    if(R.debug) this.name = Name;   // имя ячейки (строка карты) только для отладки
+    this.name = Name;   // имя ячейки (строка карты) только для отладки
   }
 
   /**
    * определить эквивалентность объекта и данного экземпляра (для множества)
-   * @param o   объект для сравнения
+   * @param obj   объект для сравнения
    * @return объекты равны - true, не равны - false
    */
   @Override
-  public boolean equals(Object o) {
+  public boolean equals(Object obj) {
     // https://javarush.com/groups/posts/2179-metodih-equals--hashcode-praktika-ispoljhzovanija
-    if (getClass() != o.getClass())
+    if (getClass() != obj.getClass())
       return false;
-    yach yo = (yach)o;
+    yach yo = (yach)obj;
     return this.icol == yo.icol  && this.irow == yo.irow;
   }
 

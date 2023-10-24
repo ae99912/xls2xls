@@ -1,4 +1,3 @@
-
 /*
  * Copyright (c) 2023. AE
  * 2023-07-11
@@ -34,8 +33,7 @@ public class Main {
 
       switch (key) {
         case "-?":
-          System.out.println("Help about program:");
-          System.out.println("> xls2xls [-v]  Karta.txt  Input.XLSX  Output.XLSX");
+          System.out.println(HelpMessage);
           return;
           //break;
 
@@ -70,11 +68,10 @@ public class Main {
     boolean only01 = k.isProp("only01");  // записывать только 0 или 1
     //
     for(yach ya: kar) {
-      Cell cell;
       int r = ya.irow - 1;    // индекс строки ячейки
       int c = ya.icol - 1;    // индекс столбца ячейки
       // если берем только ячейки с 0 или 1
-      cell = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
+      Cell cell = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
       if(only01) {
         Double d = eInp.getCellNumeric(r,c);
         if(d == null) continue;
@@ -95,5 +92,9 @@ public class Main {
     System.out.println("Записано ячеек: " + count);
     //
   }
+
+  private final static String HelpMessage =
+      "Help about program:\n" +
+      "> xls2xls [-v]  Karta.txt  Input.XLSX  Output.XLSX\n";
 
 }

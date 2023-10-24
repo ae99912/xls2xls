@@ -28,7 +28,7 @@ public class karta {
 
   karta()
   {
-    f_set = new HashSet<>();
+    f_set  = new HashSet<>();
     f_prop = new HashSet<>();
   }
 
@@ -72,7 +72,6 @@ public class karta {
    */
   private void addStr(String strKart)
   {
-
     String sss = strKart.toUpperCase().replaceAll ("\\s", "");
     if( sss.length() < 1 )
       return;
@@ -111,7 +110,7 @@ public class karta {
 
   /**
    * Проверить есть ли указанное свойтство.
-   * @param sProp - имя свойства
+   * @param sProp     имя свойства
    * @return  есть - true, нет - false
    */
   boolean isProp(String sProp)
@@ -120,8 +119,8 @@ public class karta {
   }
 
   /**
-   * преобразовать имя столбца Excel в его номер
-   * @param column - строка имени столбца
+   * преобразовать имя столбца Excel в его номер (A-1, B-2, C-3 ...)
+   * @param column    строка имени столбца
    * @return номер столбца
    */
   private static int getExcelColumnNumber(String column)
@@ -129,7 +128,7 @@ public class karta {
     int result = 0;
     for(int i = 0; i < column.length(); i++) {
       result *= 26;
-      result += column.charAt(i) - 'A' + 1;
+      result += column.toUpperCase().charAt(i) - 'A' + 1;
     }
     return result;
   }
