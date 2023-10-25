@@ -19,7 +19,7 @@ package ae;
  */
 
 public class R {
-    public final static String Ver = "Ver. 2.1"; // номер версии
+    public final static String Ver = "Ver. 2.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
