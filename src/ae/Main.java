@@ -13,6 +13,7 @@
 
 /*
 Modify
+  09.11.23 указывается номер листа
  */
 
 package ae;
@@ -27,8 +28,9 @@ public class Main {
     //
     int ia = 0;
     String[] aaa = new String[3];  // карта входнойфайл выходнойфайл
+    int   sheet = 0;  // номер листа для обработки
 
-    for(int i = 0; i < args.length && ia < aaa.length; i++) {
+    for(int i = 0; i < args.length; i++) {
       String key = args[i];
 
       switch (key) {
@@ -41,26 +43,40 @@ public class Main {
           R.debug = true;
           break;
 
+        case "-s":  // номер sheet (листа)
+          i++;
+          try {
+            sheet = Integer.parseInt(args[i]);  // номер
+          } catch (Exception e) {
+            System.err.println(ErrMessage);
+            return;
+          }
+          break;
+
         default:
           // параметр входной строки
-          aaa[ia++] = key;
+          if(ia < aaa.length) {
+            aaa[ia++] = key;
+          }
           break;
       }
     }
     if ( ia != aaa.length )  {
-      System.err.println("Неправильный формат командной строки. Смотри -?");
+      System.err.println(ErrMessage);
       return;
     }
     //
     // начнем обработку
+    //
+    System.out.println("выбран лист: " + sheet);
     //
     String kartaFile  = aaa[0];
     String inpFile    = aaa[1];
     String outFile    = aaa[2];
     //
     // объекты Excel
-    excel eInp = new excel(inpFile, 0);
-    excel eOut = new excel(outFile, 0);
+    excel eInp = new excel(inpFile, sheet);
+    excel eOut = new excel(outFile, sheet);
     int count = 0;
     // карта ячеек для копирования
     karta k = new karta();
@@ -95,6 +111,11 @@ public class Main {
 
   private final static String HelpMessage =
       "Help about program:\n" +
-      "> xls2xls [-v]  Karta.txt  Input.XLSX  Output.XLSX\n";
+      "> xls2xls [-v] [-s 0]  Karta.txt  Input.XLSX  Output.XLSX\n" +
+          "-v   отладочный вывод\n" +
+          "-s 0 обрабатываемый лист (sheet) 0, 1 и т.д. всех файлов";
+
+  private final static String ErrMessage =
+      "Неправильный формат командной строки. Смотри -?";
 
 }

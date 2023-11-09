@@ -15,11 +15,12 @@ package ae;
  16.07.23 убрал класс work, работаем в Main
  17.07.23 при задании диапазона правая граница д.б. больше левой
  24.10.23 ввел свойство only01 - заносить только 0 или 1 в ячейку, свойство в карте - строка "@only01"
+ 09.11.23 можно указать номер листа
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 2.2"; // номер версии
+    public final static String Ver = "Ver. 3.1"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
