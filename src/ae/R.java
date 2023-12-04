@@ -16,15 +16,28 @@ package ae;
  17.07.23 при задании диапазона правая граница д.б. больше левой
  24.10.23 ввел свойство only01 - заносить только 0 или 1 в ячейку, свойство в карте - строка "@only01"
  09.11.23 можно указать номер листа
+ 04.12.23 обычные сообщения только в режиме отладки
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 3.1"; // номер версии
+    public final static String Ver = "Ver. 3.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
     static boolean debug = false;   // отладочный вывод
+
+    /**
+     * Вывести сообщение, если задан режим отладки
+     * @param message - сообщение
+     */
+    static public void out(String message)
+    {
+        if(debug) {
+            System.out.println(message);
+        }
+    }
+
 //    /**
 //     * загрузка значений параметров по-умолчанию из файла res/default.properties
 //     * Порядок определения каталогов:

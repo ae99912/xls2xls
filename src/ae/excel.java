@@ -39,7 +39,7 @@ public class excel {
   boolean open(String fileName)
   {
     if(f_wbk != null) {
-      System.err.println("?-Warning-" + getClass() + "open('" + fileName + "') workbook already open");
+      System.err.println("?-Warning-" + getClass() + ".open('" + fileName + "') workbook already open");
       return false;
     }
     try {
@@ -49,7 +49,7 @@ public class excel {
       f_wbk = new XSSFWorkbook(inp); // прочитать файл с Excel 2010
       inp.close();
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + "open('" + fileName + "')  " + e.getMessage());
+      System.err.println("?-Error-" + getClass() + ".open('" + fileName + "')  " + e.getMessage());
       return false;
     }
     return true;
@@ -63,13 +63,13 @@ public class excel {
   boolean openSheet(int numSheet)
   {
     if(f_wbk == null) {
-      System.err.println("?-Warning-" + getClass() + "openSheet('" + numSheet + "') don't open workbook");
+      System.err.println("?-Warning-" + getClass() + ".openSheet('" + numSheet + "') don't open workbook");
       return false;
     }
     try {
       f_sheet = f_wbk.getSheetAt(numSheet); //Access the worksheet, so that we can update / modify it.
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + "openSheet('" + numSheet + ")  " + e.getMessage());
+      System.err.println("?-Error-" + getClass() + ".openSheet('" + numSheet + ")  " + e.getMessage());
       f_sheet = null;
       return false;
     }
@@ -193,7 +193,7 @@ public class excel {
   boolean setCellVal(int irow, int icol, Cell cell)
   {
     try {
-      if(R.debug) System.out.println("setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
+      R.out("setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
 
       Cell c = getCell(irow, icol);
       if(c == null)

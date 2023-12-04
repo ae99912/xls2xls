@@ -24,7 +24,6 @@ import java.util.Set;
 
 public class Main {
   public static void main(String[] args) {
-    System.out.println("xls2xls " + R.Ver);
     //
     int ia = 0;
     String[] aaa = new String[3];  // карта входнойфайл выходнойфайл
@@ -68,7 +67,8 @@ public class Main {
     //
     // начнем обработку
     //
-    System.out.println("выбран лист: " + sheet);
+    R.out("xls2xls " + R.Ver);
+    R.out("sheet: " + sheet);
     //
     String kartaFile  = aaa[0];
     String inpFile    = aaa[1];
@@ -105,11 +105,12 @@ public class Main {
     eInp.close();
     eOut.close();
 
-    System.out.println("Записано ячеек: " + count);
+    R.out("Записано ячеек: " + count);
     //
   }
 
   private final static String HelpMessage =
+      "xls2xls " + R.Ver + "\n" +
       "Help about program:\n" +
       "> xls2xls [-v] [-s 0]  Karta.txt  Input.XLSX  Output.XLSX\n" +
           "-v   отладочный вывод\n" +
