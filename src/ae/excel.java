@@ -126,65 +126,8 @@ public class excel {
     return false;
   }
 
-//  /**
-//   * выполним принудительно перерасчет всех формул в рабочей книге
-//   */
-//  void calculate()
-//  {
-//    if(f_wbk == null) {
-//      System.err.println("?-Error-excel.calculate() don't open Excel");
-//    }
-//    // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
-//    // перерасчет всех формул на листе
-//    // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
-//    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
-//    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
-//  }
-
-//  /**
-//   * Установить числовое значение ячейки в заданной строке таблицы
-//   * @param irow    строка
-//   * @param icol    номер колонки
-//   * @param val     устанавливаемое значения (numeric)
-//   * @return      1 - значение установлено, 0 - не установлено
-//   */
-//  boolean setCellVal(int irow, int icol, Double val)
-//  {
-//    try {
-//      Cell c = getCell(irow, icol);
-//      if(c == null)
-//        return false;
-//      c.setCellValue(val);  // Access the cell
-//    } catch (Exception e) {
-//      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + val + ")-error set value. " + e.getMessage());
-//      return false;
-//    }
-//    return true;
-//  }
-//
-//  /**
-//   * Установить строковое значение ячейки в заданной строке таблицы
-//   * @param irow    строка
-//   * @param icol    колонка
-//   * @param val     устанавливаемое значения (String)
-//   * @return      1 - значение установлено, 0 - не установлено
-//   */
-//  boolean setCellVal(int irow, int icol, String val)
-//  {
-//    try {
-//      Cell c = getCell(irow, icol);
-//      if(c == null)
-//        return false;
-//      c.setCellValue(val);  // Access the cell
-//    } catch (Exception e) {
-//      System.err.println("?-Warning-setCellVal(" + irow + "," + icol + ", " + val + ")-error set value. " + e.getMessage());
-//      return false;
-//    }
-//    return true;
-//  }
-
   /**
-   * записать в ячейку значение: строковое или числовое
+   * записать в ячейку таблицы значение по указанной ячейке
    * @param irow  строка
    * @param icol  колонка
    * @param cell  ячейка, откуда берется значение
@@ -194,38 +137,70 @@ public class excel {
   {
     try {
       R.out("setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
-
       Cell c = getCell(irow, icol);
       if(c == null)
         return false;
-      switch (cell.getCellType()) { // тип ячейки
-        // строка
-        case Cell.CELL_TYPE_STRING:
-          String str = cell.getStringCellValue();
-          if( str != null && str.length() > 0) {
-            c.setCellValue(str);
-            return true;
-          }
-          break;
-
-        // число
-        case Cell.CELL_TYPE_NUMERIC:
-          double dbl = cell.getNumericCellValue();
-          c.setCellValue(dbl);
-          return true;
-          // break;
-
-        // логическое
-        case Cell.CELL_TYPE_BOOLEAN:
-          boolean bol = cell.getBooleanCellValue();
-          c.setCellValue(bol);
-          return true;
+      int type = cell.getCellType();  // тип ячейки
+      if(type == Cell.CELL_TYPE_FORMULA) {
+        // если формула, то поставим ее значение
+        type = cell.getCachedFormulaResultType();
+        R.out("?-Warning-" + getClass() + ".setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ") formula: " + cell.getCellFormula());
       }
+      return setCellTypeContent(cell, type, c);
     } catch (Exception e) {
       System.err.println("?-Warning-" + getClass() + ".setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")-error set value. " + e.getMessage());
       return false;
     }
-    return false;
+  }
+
+  /**
+   * Задает значение выходной ячейки по входной ячейке и ее типу.
+   * Используется для записи копий значений или значений формулы
+   * https://stackoverflow.com/questions/62305485/how-to-get-function-expression-apache-poi
+   * @param cell    входная ячейка (может быть с формулой)
+   * @param type    тип вычисленного значения для выходной ячейки
+   * @param cellOut выходная ячейка
+   * @return строка значения
+   */
+  private static boolean setCellTypeContent(Cell cell, int type, Cell cellOut) {
+    switch (type) {
+
+      case Cell.CELL_TYPE_STRING:
+        //System.out.println("String: " + cell.getRichStringCellValue().getString());
+        cellOut.setCellValue(cell.getRichStringCellValue().getString());
+        break;
+
+      case Cell.CELL_TYPE_NUMERIC:
+        if (DateUtil.isCellDateFormatted(cell)) {
+          //System.out.println("Date: " + cell.getDateCellValue());
+          cellOut.setCellValue(cell.getDateCellValue());
+        } else {
+          //System.out.println("Number: " + cell.getNumericCellValue());
+          cellOut.setCellValue(cell.getNumericCellValue());
+        }
+        break;
+
+      case Cell.CELL_TYPE_BOOLEAN:
+        //System.out.println("Boolean: " + cell.getBooleanCellValue());
+        cellOut.setCellValue(cell.getBooleanCellValue());
+        break;
+
+      case Cell.CELL_TYPE_FORMULA:
+        //System.out.print("Formula result is ");
+        cellOut.setCellValue("recursive formula");
+        break;
+
+      case Cell.CELL_TYPE_BLANK:
+        // System.out.println("Blank cell.");
+        cellOut.setCellValue("");
+        break;
+
+      default:
+        System.err.println("?-Warning-excel.setCellTypeContent(). This should not occur.");
+        return false;
+
+    }
+    return true;
   }
 
   /**
@@ -253,30 +228,6 @@ public class excel {
     }
     return c;
   }
-
-//  int getCellType(int irow, int icol)
-//  {
-//    String str = null;
-//    int typeCell = Cell.CELL_TYPE_ERROR;
-//    Cell c = getCell(irow, icol);
-//    if(c != null) {
-//      typeCell = c.getCellType();
-//    }
-//    return typeCell;
-//  }
-//
-//  String getCellStr(int irow, int icol)
-//  {
-//    String str = null;
-//    Cell c = getCell(irow, icol);
-//    if(c != null) {
-//      if (c.getCellType() == Cell.CELL_TYPE_STRING) {   // string 1
-//        str = c.getStringCellValue();
-//      }
-//    }
-//    return str;
-//  }
-//
 
   /**
    * Получить из ячейки число
@@ -317,3 +268,20 @@ public class excel {
   }
 
 } // end of class
+
+  /*
+
+   // выполним принудительно перерасчет всех формул в рабочей книге
+
+  void calculate()
+  {
+    if(f_wbk == null) {
+      System.err.println("?-Error-excel.calculate() don't open Excel");
+    }
+    // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
+    // перерасчет всех формул на листе
+    // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
+    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
+    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
+  }
+  */

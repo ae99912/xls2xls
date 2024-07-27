@@ -17,11 +17,12 @@ package ae;
  24.10.23 ввел свойство only01 - заносить только 0 или 1 в ячейку, свойство в карте - строка "@only01"
  09.11.23 можно указать номер листа
  04.12.23 обычные сообщения только в режиме отладки
+ 27.07.24 при копировании ячейки с формулой вставляется значение формулы
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 3.2"; // номер версии
+    public final static String Ver = "Ver. 4.1"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
