@@ -94,7 +94,7 @@ public class Main {
         int i01 = d.intValue();
         if(i01!=0 && i01!=1) continue;
       }
-      if(eOut.setCellVal(r, c, cell)) {   // поместим ячейку в выходной Excel
+      if(eOut.setCellTo(cell, r, c)) {   // поместим ячейку в выходной Excel (строка, колонка)
         count++;  // считаем переносы значений
       }
     }

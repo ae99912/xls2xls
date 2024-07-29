@@ -128,12 +128,12 @@ public class excel {
 
   /**
    * записать в ячейку таблицы значение по указанной ячейке
-   * @param irow  строка
-   * @param icol  колонка
    * @param cell  ячейка, откуда берется значение
+   * @param irow  строка ячейки, куда помещаем значение входной ячейки
+   * @param icol  колонка ячейки
    * @return  результат записи - было записано значение или нет
    */
-  boolean setCellVal(int irow, int icol, Cell cell)
+  boolean setCellTo(Cell cell, int irow, int icol)
   {
     try {
       R.out("setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
@@ -144,11 +144,11 @@ public class excel {
       if(type == Cell.CELL_TYPE_FORMULA) {
         // если формула, то поставим ее значение
         type = cell.getCachedFormulaResultType();
-        R.out("?-Warning-" + getClass() + ".setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ") formula: " + cell.getCellFormula());
+        R.out("?-Warning-" + getClass() + ".setCellValTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ") formula: " + cell.getCellFormula());
       }
       return setCellTypeContent(cell, type, c);
     } catch (Exception e) {
-      System.err.println("?-Warning-" + getClass() + ".setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")-error set value. " + e.getMessage());
+      System.err.println("?-Warning-" + getClass() + ".setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")-error set value. " + e.getMessage());
       return false;
     }
   }
@@ -192,7 +192,7 @@ public class excel {
 
       case Cell.CELL_TYPE_BLANK:
         // System.out.println("Blank cell.");
-        cellOut.setCellValue("");
+        // не изменяем выходную ячейку - cellOut.setCellValue("");
         break;
 
       default:
@@ -263,6 +263,19 @@ public class excel {
 
       case Cell.CELL_TYPE_BOOLEAN:
         return "" + cell.getBooleanCellValue();
+
+      // формула
+      case Cell.CELL_TYPE_FORMULA:
+        return "=" + cell.getCellFormula();
+
+      // бланк
+      case Cell.CELL_TYPE_BLANK:
+        return "<blank>";
+
+      // ошибка
+      case Cell.CELL_TYPE_ERROR:
+        return "<error>";
+
     }
     return "<...>";
   }

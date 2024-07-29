@@ -18,11 +18,12 @@ package ae;
  09.11.23 можно указать номер листа
  04.12.23 обычные сообщения только в режиме отладки
  27.07.24 при копировании ячейки с формулой вставляется значение формулы
+ 29.07.24 ячейка с типом BLANK не изменяет выходную ячейку
 
  */
 
 public class R {
-    public final static String Ver = "Ver. 4.1"; // номер версии
+    public final static String Ver = "Ver. 4.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
