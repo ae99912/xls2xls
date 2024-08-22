@@ -247,6 +247,16 @@ public class excel {
     return dbl;
   }
 
+  String  getCellString(int irow, int icol)
+  {
+    String str = null;
+    Cell c = getCell(irow, icol);
+    if(c != null) {
+      str = getCellStrValue(c);
+    }
+    return str;
+  }
+
   public static String  getCellStrValue(Cell cell)
   {
     if(cell == null)
@@ -254,7 +264,7 @@ public class excel {
     switch (cell.getCellType()) { // тип ячейки
       // строка
       case Cell.CELL_TYPE_STRING:
-        return "'" + cell.getStringCellValue() + "'";
+        return cell.getStringCellValue();
 
       // число
       case Cell.CELL_TYPE_NUMERIC:

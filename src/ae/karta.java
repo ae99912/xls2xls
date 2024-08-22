@@ -9,6 +9,7 @@
 
   23.10.23 добавим к карте свойство (prop), пусть они начинаются с @
            первым свойством будет @only01 - читать только 0 и 1
+  22.08.24 свойства назначаются следующим за ними ячейкам
  */
 package ae;
 
@@ -24,12 +25,10 @@ public class karta {
   final private Pattern cell_pattern = Pattern.compile("([A-Z]+)([0-9]+)");  // паттерн для имени ячейки A12, B3 ...
 
   HashSet<yach> f_set;      // набор множества ячеек
-  HashSet<String> f_prop;   // набор свойств
 
   karta()
   {
     f_set  = new HashSet<>();
-    f_prop = new HashSet<>();
   }
 
   /**
@@ -42,6 +41,7 @@ public class karta {
     try {
      BufferedReader rdr = new BufferedReader(new FileReader(fileName));
       String str;
+      String curProp = "";   // текущее свойство ячеек
       while( (str = rdr.readLine()) != null ) {
         if(str.length() > 1) {
           switch (str.charAt(0)) {
@@ -49,11 +49,11 @@ public class karta {
               break;
 
             case '@':   // свойство
-              f_prop.add(str.substring(1));
+              curProp = str.substring(1); // строка свойств
               break;
 
             default:    // ячейка
-              addStr(str);
+              addStr(str, curProp);
               break;
           }
         }
@@ -70,7 +70,7 @@ public class karta {
    * добавить в множество ячеек ячейки из строки карты как имя отдельной ячейки или диапазона ячеек
    * @param strKart   строка карты переноса
    */
-  private void addStr(String strKart)
+  private void addStr(String strKart, String prop)
   {
     String sss = strKart.toUpperCase().replaceAll ("\\s", "");
     if( sss.length() < 1 )
@@ -84,7 +84,7 @@ public class karta {
       int c1 = getExcelColumnNumber(mat.group(1));
       int r1 = Integer.parseInt(mat.group(2));
       // добавим первую ячейку, неважно одна или диапазон
-      this.f_set.add(new yach(r1, c1, strKart));
+      this.f_set.add(new yach(r1, c1, prop, strKart));
       //
       // проверим - есть еще ячейка в строке, если есть значит диапазон
       if (!mat.find())
@@ -100,22 +100,12 @@ public class karta {
       for (int ic = c1; ic <= c2; ic++) {
         for (int jr = r1; jr <= r2; jr++) {
           // добавим ячейку в набор
-          this.f_set.add(new yach(jr, ic, strKart));
+          this.f_set.add(new yach(jr, ic, prop, strKart));
         }
       }
     } catch (Exception e) {
       System.err.println("?-Error-" + getClass() +".addStrKart('" + strKart + "') error conversion: " + e.getMessage());
     }
-  }
-
-  /**
-   * Проверить есть ли указанное свойтство.
-   * @param sProp     имя свойства
-   * @return  есть - true, нет - false
-   */
-  boolean isProp(String sProp)
-  {
-    return f_prop.contains(sProp);
   }
 
   /**

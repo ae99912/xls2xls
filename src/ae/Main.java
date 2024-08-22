@@ -21,6 +21,8 @@ package ae;
 import org.apache.poi.ss.usermodel.Cell;
 
 import java.util.Set;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class Main {
   public static void main(String[] args) {
@@ -81,18 +83,45 @@ public class Main {
     // карта ячеек для копирования
     karta k = new karta();
     Set<yach> kar = k.open(kartaFile);
-    boolean only01 = k.isProp("only01");  // записывать только 0 или 1
     //
+
+    // пройдемся по ячейкам карты
     for(yach ya: kar) {
       int r = ya.irow - 1;    // индекс строки ячейки
       int c = ya.icol - 1;    // индекс столбца ячейки
-      // если берем только ячейки с 0 или 1
+      //
       Cell cell = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
-      if(only01) {
-        Double d = eInp.getCellNumeric(r,c);
-        if(d == null) continue;
-        int i01 = d.intValue();
-        if(i01!=0 && i01!=1) continue;
+      //
+      // строка паттерна регулярного выражения
+      String strPattern;
+      // свойство данной ячейки
+      switch(ya.prop) {
+        case "only01":
+          strPattern = "^[0,1]\\D";       // только 0 или 1
+          break;
+
+        case "only-01":
+          strPattern = "^[-,0,1]\\D";     // только -, 0 или 1
+          break;
+
+        default:
+          final String Name_regex = "regex";    // имя свойства "регулярное выражение"
+          if(ya.prop.startsWith(Name_regex)) {  // свойсто это?
+            // строка после имени свойства - само регулярное выражение
+            strPattern = ya.prop.substring(Name_regex.length());
+          } else {
+            strPattern = null;  // нет паттерна для свойства (нет свойства)
+          }
+          break;
+      }
+      // определено ли регулярное выражение для проверки соответствия значения в ячейке?
+      if(strPattern != null) {
+        String sy = excel.getCellStrValue(cell);
+        Pattern pat = Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
+        // в конце строки добавлю пробел, для упрощения паттернов
+        Matcher mat = pat.matcher(sy + " ");
+        if(! mat.find())
+          continue;   // не соответствует выражение - пропускаем
       }
       if(eOut.setCellTo(cell, r, c)) {   // поместим ячейку в выходной Excel (строка, колонка)
         count++;  // считаем переносы значений
