@@ -25,6 +25,7 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
+  final static String Name_regex = "regex";    // имя свойства "регулярное выражение"
   public static void main(String[] args) {
     //
     int ia = 0;
@@ -97,16 +98,23 @@ public class Main {
       // свойство данной ячейки
       switch(ya.prop) {
         case "only01":
-          strPattern = "^[0,1]\\D";       // только 0 или 1
+          strPattern = "^[01](\\.0|,0)?$";        // только 0 или 1
           break;
 
         case "only-01":
-          strPattern = "^[-,0,1]\\D";     // только -, 0 или 1
+          strPattern = "^[-01](\\.0|,0)?$";       // только - или 0 или 1
+          break;
+
+        case "onlyint":
+          strPattern = "^-?[0-9]+(\\.0|,0)?$";    // только целые
+          break;
+
+        case "onlynum":
+          strPattern = "^-?[0-9]+[,.]?[0-9]*$";   // только числа (целые и действительные)
           break;
 
         default:
-          final String Name_regex = "regex";    // имя свойства "регулярное выражение"
-          if(ya.prop.startsWith(Name_regex)) {  // свойсто это?
+          if(ya.prop.startsWith(Name_regex)) {    // это регулярное?
             // строка после имени свойства - само регулярное выражение
             strPattern = ya.prop.substring(Name_regex.length());
           } else {
@@ -117,9 +125,8 @@ public class Main {
       // определено ли регулярное выражение для проверки соответствия значения в ячейке?
       if(strPattern != null) {
         String sy = excel.getCellStrValue(cell);
-        Pattern pat = Pattern.compile(strPattern, Pattern.CASE_INSENSITIVE);
-        // в конце строки добавлю пробел, для упрощения паттернов
-        Matcher mat = pat.matcher(sy + " ");
+        Pattern pat = Pattern.compile(strPattern);
+        Matcher mat = pat.matcher(sy);
         if(! mat.find())
           continue;   // не соответствует выражение - пропускаем
       }
