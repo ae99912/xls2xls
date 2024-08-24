@@ -28,10 +28,12 @@ package ae;
  23.08.24 модификация регулярных выражений, добавил новые свойства:
             onlyint - в ячейке целое число
             onlynum - в ячейке любое число
+ 24.08.24 если в Excel нет нужной строки, то создаем ее
+
 */
 
 public class R {
-    public final static String Ver = "Ver. 5.2"; // номер версии
+    public final static String Ver = "Ver. 5.3"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

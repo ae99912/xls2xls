@@ -72,13 +72,14 @@ public class karta {
    */
   private void addStr(String strKart, String prop)
   {
-    String sss = strKart.toUpperCase().replaceAll ("\\s", "");
+    // буквы в верхний регистр и уберем все пробелы
+    String sss = strKart.toUpperCase().replaceAll("\\s", "");
     if( sss.length() < 1 )
       return;
     //
     try {
       Matcher mat = cell_pattern.matcher(sss);
-      if (!mat.find()) {
+      if( !mat.find() ) {
         throw new NumberFormatException("not found cell name");
       }
       int c1 = getExcelColumnNumber(mat.group(1));
@@ -87,7 +88,7 @@ public class karta {
       this.f_set.add(new yach(r1, c1, prop, strKart));
       //
       // проверим - есть еще ячейка в строке, если есть значит диапазон
-      if (!mat.find())
+      if( !mat.find() )
         return;
       // есть вторая ячейка, значит диапазон
       int c2 = getExcelColumnNumber(mat.group(1));
@@ -97,14 +98,14 @@ public class karta {
         throw new NumberFormatException("right less that left");
       }
       // заполним диапазон от края до края
-      for (int ic = c1; ic <= c2; ic++) {
+      for(int ic = c1; ic <= c2; ic++) {
         for (int jr = r1; jr <= r2; jr++) {
           // добавим ячейку в набор
           this.f_set.add(new yach(jr, ic, prop, strKart));
         }
       }
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() +".addStrKart('" + strKart + "') error conversion: " + e.getMessage());
+      System.err.println("?-Error-karta.addStr('" + strKart + "') error conversion: " + e.getMessage());
     }
   }
 

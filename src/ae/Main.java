@@ -85,7 +85,6 @@ public class Main {
     karta k = new karta();
     Set<yach> kar = k.open(kartaFile);
     //
-
     // пройдемся по ячейкам карты
     for(yach ya: kar) {
       int r = ya.irow - 1;    // индекс строки ячейки
@@ -98,37 +97,37 @@ public class Main {
       // свойство данной ячейки
       switch(ya.prop) {
         case "only01":
-          strPattern = "^[01](\\.0|,0)?$";        // только 0 или 1
+          strPattern = "[01](\\.0)?";        // только 0 или 1 (целое число завершается .0 , а запятых нет)
           break;
 
         case "only-01":
-          strPattern = "^[-01](\\.0|,0)?$";       // только - или 0 или 1
+          strPattern = "[-01](\\.0)?";       // только - или 0 или 1
           break;
 
         case "onlyint":
-          strPattern = "^-?[0-9]+(\\.0|,0)?$";    // только целые
+          strPattern = "-?[0-9]+(\\.0)?";    // только целые
           break;
 
         case "onlynum":
-          strPattern = "^-?[0-9]+[,.]?[0-9]*$";   // только числа (целые и действительные)
+          strPattern = "-?[0-9]+\\.?[0-9]*";   // только числа (целые и действительные)
           break;
 
         default:
-          if(ya.prop.startsWith(Name_regex)) {    // это регулярное?
+          if(ya.prop.startsWith(Name_regex)) {    // это свойство "регулярное выражение"?
             // строка после имени свойства - само регулярное выражение
             strPattern = ya.prop.substring(Name_regex.length());
           } else {
-            strPattern = null;  // нет паттерна для свойства (нет свойства)
+            strPattern = null;  // нет свойства - паттерн пустой
           }
           break;
       }
       // определено ли регулярное выражение для проверки соответствия значения в ячейке?
       if(strPattern != null) {
-        String sy = excel.getCellStrValue(cell);
+        String sy = excel.getCellStrValue(cell);    // значение ячейки
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
-        if(! mat.find())
-          continue;   // не соответствует выражение - пропускаем
+        if( !mat.matches() )  // сравнивает ВСЮ строку с шаблоном
+          continue;           // не соответствует шаблону - пропускаем
       }
       if(eOut.setCellTo(cell, r, c)) {   // поместим ячейку в выходной Excel (строка, колонка)
         count++;  // считаем переносы значений
@@ -140,7 +139,7 @@ public class Main {
     }
     eInp.close();
     eOut.close();
-
+    //
     R.out("Записано ячеек: " + count);
     //
   }
@@ -155,4 +154,4 @@ public class Main {
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";
 
-}
+}  // END OF CLASS MAIN

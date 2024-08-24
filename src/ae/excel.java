@@ -24,10 +24,8 @@ public class excel {
   {
     if( open(fileName) ) {
       if( !openSheet(numSheet) ) {
-        System.err.println("?-Error-" + getClass() + ".excel() don't open worksheet");
+        System.err.println("?-Error-excel('" + fileName + "'," + numSheet + ") don't open worksheet");
       }
-    } else {
-      System.err.println("?-Error-" + getClass() + ".excel() don't open workbook");
     }
   }
 
@@ -39,7 +37,7 @@ public class excel {
   boolean open(String fileName)
   {
     if(f_wbk != null) {
-      System.err.println("?-Warning-" + getClass() + ".open('" + fileName + "') workbook already open");
+      System.err.println("?-Warning-open('" + fileName + "') workbook already open");
       return false;
     }
     try {
@@ -49,7 +47,7 @@ public class excel {
       f_wbk = new XSSFWorkbook(inp); // прочитать файл с Excel 2010
       inp.close();
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + ".open('" + fileName + "')  " + e.getMessage());
+      System.err.println("?-Error-open('" + fileName + "')  " + e.getMessage());
       return false;
     }
     return true;
@@ -63,13 +61,13 @@ public class excel {
   boolean openSheet(int numSheet)
   {
     if(f_wbk == null) {
-      System.err.println("?-Warning-" + getClass() + ".openSheet('" + numSheet + "') don't open workbook");
+      System.err.println("?-Warning-openSheet('" + numSheet + "') don't open worksheet");
       return false;
     }
     try {
       f_sheet = f_wbk.getSheetAt(numSheet); //Access the worksheet, so that we can update / modify it.
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + ".openSheet('" + numSheet + ")  " + e.getMessage());
+      System.err.println("?-Error-openSheet('" + numSheet + ")  " + e.getMessage());
       f_sheet = null;
       return false;
     }
@@ -84,7 +82,7 @@ public class excel {
       try {
         f_wbk.close();
       } catch (Exception e) {
-        System.err.println("?-Error-" + getClass() + ".close()  " + e.getMessage());
+        System.err.println("?-Error-close() " + e.getMessage());
       }
       f_wbk   = null;
       f_sheet = null;
@@ -99,7 +97,7 @@ public class excel {
   boolean write(String fileName)
   {
     if(f_wbk == null) {
-      System.err.println("?-Error-" + getClass() + ".write('" + fileName + "') don't open Excel");
+      System.err.println("?-Error-write('" + fileName + "') don't open Excel");
       return false;
     }
     try {
@@ -120,7 +118,7 @@ public class excel {
         return true;
       }
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + ".write('" + fileName +"') " + e.getMessage());
+      System.err.println("?-Error-write('" + fileName +"') " + e.getMessage());
       return false;
     }
     return false;
@@ -135,8 +133,9 @@ public class excel {
    */
   boolean setCellTo(Cell cell, int irow, int icol)
   {
+    // имя функции
     try {
-      R.out("setCellVal(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
+      R.out("setCellTo(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
       Cell c = getCell(irow, icol);
       if(c == null)
         return false;
@@ -144,11 +143,11 @@ public class excel {
       if(type == Cell.CELL_TYPE_FORMULA) {
         // если формула, то поставим ее значение
         type = cell.getCachedFormulaResultType();
-        R.out("?-Warning-" + getClass() + ".setCellValTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ") formula: " + cell.getCellFormula());
+        R.out("?-Warning-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ") formula: " + cell.getCellFormula());
       }
       return setCellTypeContent(cell, type, c);
     } catch (Exception e) {
-      System.err.println("?-Warning-" + getClass() + ".setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")-error set value. " + e.getMessage());
+      System.err.println("?-Warning-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")-error set value. " + e.getMessage());
       return false;
     }
   }
@@ -164,7 +163,6 @@ public class excel {
    */
   private static boolean setCellTypeContent(Cell cell, int type, Cell cellOut) {
     switch (type) {
-
       case Cell.CELL_TYPE_STRING:
         //System.out.println("String: " + cell.getRichStringCellValue().getString());
         cellOut.setCellValue(cell.getRichStringCellValue().getString());
@@ -193,10 +191,10 @@ public class excel {
       case Cell.CELL_TYPE_BLANK:
         // System.out.println("Blank cell.");
         // не изменяем выходную ячейку - cellOut.setCellValue("");
-        break;
+        return false;
 
       default:
-        System.err.println("?-Warning-excel.setCellTypeContent(). This should not occur.");
+        System.err.println("?-Warning-setCellTypeContent(...," + type + ",...). This should not have happened.");
         return false;
 
     }
@@ -207,23 +205,26 @@ public class excel {
    * Получить ячейку в строке в заданной колонке
    * @param irow   строка
    * @param icol   колонка
-   * @return  ячейка, null - нет ячейки
+   * @return  ячейка, null - ошибка (совсем нет ячейки)
    */
   Cell getCell(int irow, int icol)
   {
     if(f_sheet == null) {
-      System.err.println("?-Error-" + getClass() + ".getCell(" + irow + "," + icol + ")  don't open sheet.");
+      System.err.println("?-Error-getCell(" + irow + "," + icol + ")  don't open worksheet.");
       return null;
     }
     Cell c;
     try {
       Row row = f_sheet.getRow(irow);
+      if(row == null) {
+        row = f_sheet.createRow(irow);
+      }
       c = row.getCell(icol);  // Access the cell
-      if (c == null) {
+      if(c == null) {
         c = row.createCell(icol); // создадим ячейку
       }
     } catch (Exception e) {
-      System.err.println("?-Error-" + getClass() + ".getCell(" + irow + "," + icol  + ") " + e.getMessage());
+      System.err.println("?-Error-getCell(" + irow + "," + icol  + ") " + e.getMessage());
       return null;
     }
     return c;
