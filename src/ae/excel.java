@@ -133,21 +133,19 @@ public class excel {
    */
   boolean setCellTo(Cell cell, int irow, int icol)
   {
-    // имя функции
     try {
-      R.out("setCellTo(" + irow + "," + icol + ", " + getCellStrValue(cell) + ")" );
       Cell c = getCell(irow, icol);
-      if(c == null)
-        return false;
       int type = cell.getCellType();  // тип ячейки
       if(type == Cell.CELL_TYPE_FORMULA) {
         // если формула, то поставим ее значение
         type = cell.getCachedFormulaResultType();
         R.out("?-Warning-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ") formula: " + cell.getCellFormula());
       }
-      return setCellTypeContent(cell, type, c);
+      boolean r = setCellTypeContent(cell, type, c);
+      R.out("setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")");
+      return r;
     } catch (Exception e) {
-      System.err.println("?-Warning-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")-error set value. " + e.getMessage());
+      System.err.println("?-Error-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")-error set value. " + e.getMessage());
       return false;
     }
   }
@@ -262,7 +260,14 @@ public class excel {
   {
     if(cell == null)
       return "null";
-    switch (cell.getCellType()) { // тип ячейки
+    return getCellStrValue(cell.getCellType(), cell);
+  }
+
+  public static String  getCellStrValue(int type, Cell cell)
+  {
+    if(cell == null)
+      return "null";
+    switch (type) { // тип ячейки
       // строка
       case Cell.CELL_TYPE_STRING:
         return cell.getStringCellValue();
@@ -277,7 +282,10 @@ public class excel {
 
       // формула
       case Cell.CELL_TYPE_FORMULA:
-        return "=" + cell.getCellFormula();
+        //return "=" + cell.getCellFormula();
+        // если формула, то поставим ее значение
+        int typeres = cell.getCachedFormulaResultType();
+        return getCellStrValue(typeres, cell);
 
       // бланк
       case Cell.CELL_TYPE_BLANK:
@@ -290,6 +298,7 @@ public class excel {
     }
     return "<...>";
   }
+
 
 } // end of class
 
