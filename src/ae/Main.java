@@ -113,7 +113,7 @@ public class Main {
           break;
 
         case R.PAT_BLANK:
-          strPattern = R.PAT_BLANK;  // паттерн для обнуления содержимого целефой ячейки
+          strPattern = R.PAT_BLANK;  // паттерн для обнуления содержимого целевой ячейки
           break;
 
         default:
@@ -129,18 +129,16 @@ public class Main {
       if(strPattern != null) {
         if(strPattern.compareTo(R.PAT_BLANK)==0) {
           // требуется очистка выходной ячейки
-          // при этом содержимое входного файла не важно
-          Cell co = eOut.getCell(r,c);  // выходная ячейка
-          co.setCellValue("");
-          co.setCellType(Cell.CELL_TYPE_BLANK);
-          R.out("setCellTo(BLANK," + r + "," + c + ")");
-          count++;
+          // при этом содержимое входного файла неважно
+          if(eOut.setCellBlank(r, c)) {
+            count++;  // считаем переносы значений
+          }
           continue;
         }
         String sy = excel.getCellStrValue(cell);    // значение ячейки
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
-        if (!mat.matches())  // сравнивает ВСЮ строку с шаблоном
+        if(!mat.matches())  // сравнивает ВСЮ строку с шаблоном
           continue;           // не соответствует шаблону - пропускаем
       }
       if(eOut.setCellTo(cell, r, c)) {   // поместим ячейку в выходной Excel (строка, колонка)
@@ -155,7 +153,6 @@ public class Main {
     eOut.close();
     //
     R.out("Записано ячеек: " + count);
-    //
   }
 
   private final static String HelpMessage =

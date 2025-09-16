@@ -151,6 +151,27 @@ public class excel {
   }
 
   /**
+   * Установить в ячейку пустое значение BLANK
+   * @param irow строка ячейки
+   * @param icol колонка ячейки
+   * @return результат записи - было записано значение или нет
+   */
+  boolean setCellBlank(int irow, int icol)
+  {
+    try {
+      Cell c = getCell(irow, icol);
+      // c.setCellValue(" ");
+      c.setCellType(Cell.CELL_TYPE_BLANK);
+      R.out("setCellBlank(" + irow + "," + icol + ")");
+      return true;
+    } catch (Exception e) {
+      System.err.println("?-Error-setCellBlank(" + irow + "," + icol + ")-error set value. " + e.getMessage());
+      return false;
+    }
+
+  }
+
+  /**
    * Задает значение выходной ячейки по входной ячейке и ее типу.
    * Используется для записи копий значений или значений формулы
    * https://stackoverflow.com/questions/62305485/how-to-get-function-expression-apache-poi
