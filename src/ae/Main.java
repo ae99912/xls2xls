@@ -18,7 +18,7 @@ Modify
 
 package ae;
 
-import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.*;
 
 import java.util.Set;
 import java.util.regex.Matcher;
@@ -95,7 +95,7 @@ public class Main {
       // строка паттерна регулярного выражения
       String strPattern;
       // свойство данной ячейки
-      switch(ya.prop) {
+      switch (ya.prop) {
         case "only01":
           strPattern = "[01](\\.0)?";        // только 0 или 1 (целое число завершается .0 , а запятых нет)
           break;
@@ -112,6 +112,10 @@ public class Main {
           strPattern = "-?[0-9]+\\.?[0-9]*";   // только числа (целые и действительные)
           break;
 
+        case R.PAT_BLANK:
+          strPattern = R.PAT_BLANK;  // паттерн для обнуления содержимого целефой ячейки
+          break;
+
         default:
           if(ya.prop.startsWith(Name_regex)) {    // это свойство "регулярное выражение"?
             // строка после имени свойства - само регулярное выражение
@@ -123,10 +127,20 @@ public class Main {
       }
       // определено ли регулярное выражение для проверки соответствия значения в ячейке?
       if(strPattern != null) {
+        if(strPattern.compareTo(R.PAT_BLANK)==0) {
+          // требуется очистка выходной ячейки
+          // при этом содержимое входного файла не важно
+          Cell co = eOut.getCell(r,c);  // выходная ячейка
+          co.setCellValue("");
+          co.setCellType(Cell.CELL_TYPE_BLANK);
+          R.out("setCellTo(BLANK," + r + "," + c + ")");
+          count++;
+          continue;
+        }
         String sy = excel.getCellStrValue(cell);    // значение ячейки
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
-        if( !mat.matches() )  // сравнивает ВСЮ строку с шаблоном
+        if (!mat.matches())  // сравнивает ВСЮ строку с шаблоном
           continue;           // не соответствует шаблону - пропускаем
       }
       if(eOut.setCellTo(cell, r, c)) {   // поместим ячейку в выходной Excel (строка, колонка)
