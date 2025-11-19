@@ -67,14 +67,23 @@ public class karta {
   }
 
   /**
+   * Вернуть набор ячеек
+   * @return набор ячеек
+   */
+  Set<yach> getSet()
+  {
+    return f_set;
+  }
+
+  /**
    * добавить в множество ячеек ячейки из строки карты как имя отдельной ячейки или диапазона ячеек
    * @param strKart   строка карты переноса
    */
-  private void addStr(String strKart, String prop)
+  public void addStr(String strKart, String prop)
   {
     // буквы в верхний регистр и уберем все пробелы
     String sss = strKart.toUpperCase().replaceAll("\\s", "");
-    if( sss.length() < 1 )
+    if( sss.isEmpty() )
       return;
     //
     try {

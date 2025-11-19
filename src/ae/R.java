@@ -32,11 +32,12 @@ package ae;
  04.09.24 функция getCellStrValue если формула, возвращает значение
  16.09.25 свойство ячейки @blank, когда требуется очистка выходной ячейки
           добавил функцию setCellBlank
+ 19.11.25 новая программа для записи строки в указанную ячейку str2xls (MainStr)
 
 */
 
 public class R {
-    public final static String Ver = "Ver. 5.6"; // номер версии
+    public final static String Ver = "Ver. 6.1"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
