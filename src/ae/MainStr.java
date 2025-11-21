@@ -60,10 +60,14 @@ public class MainStr {
     R.out("str2xls " + R.Ver);
     R.out("sheet: " + sheet);
     //
-    String inpStr  = aaa[0];
-    String array   = aaa[1];
-    String xlsFile = aaa[2];
-    excel eXls     = new excel(xlsFile, sheet);
+    String inpStr  = aaa[0];  // строка для записи
+    String array   = aaa[1];  // массив куда запись
+    String xlsFile = aaa[2];  // имя файла
+    excel eXls = new excel();
+    if( !eXls.open(xlsFile, sheet) ) {
+      System.exit(2);
+      return;
+    }
     // карта ячеек для копирования
     karta k = new karta();
     k.addStr(array, "");
@@ -77,14 +81,16 @@ public class MainStr {
       //
       Cell cell = eXls.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
       cell.setCellValue(inpStr);
+      R.out(inpStr + " -> (" + ya.irow + "," + ya.icol +")" );
       count++;  // считаем записи
     }
-    if(count >0) {
+    if( count > 0 ) {
       if( !eXls.write(xlsFile) ) {
         System.err.println("?-Error-don't write: " + xlsFile);
         System.exit(2);
       }
     }
+    R.out("записано ячеек: " + count);
     eXls.close();
   }
 
@@ -94,7 +100,10 @@ public class MainStr {
                   "Help about program:\n" +
                   "> str2xls [-v] [-s 0]  string  array  File.xlsx\n" +
                   "-v   отладочный вывод\n" +
-                  "-s 0 обрабатываемый лист (sheet) 0, 1 и т.д.";
+                  "-s 0 обрабатываемый лист (sheet) 0, 1 и т.д.\n" +
+                  "string строка для записи\n" +
+                  "array  массив куда запись A1:B4\n" +
+                  "File   имя файла Excel";
 
   private final static String ErrMessage =
           "Неправильный формат командной строки. Смотри -?";

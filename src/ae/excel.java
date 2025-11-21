@@ -20,13 +20,28 @@ public class excel {
   Workbook      f_wbk       = null;   // workbook Excel рабочая книга
   Sheet         f_sheet     = null;   // sheet Excel рабочий лист
 
+  excel()
+  {}
+
   excel(String fileName, int numSheet)
   {
-    if( open(fileName) ) {
-      if( !openSheet(numSheet) ) {
-        System.err.println("?-Error-excel('" + fileName + "'," + numSheet + ") don't open worksheet");
-      }
+    if( !open(fileName, numSheet) ) {
+      System.err.println("?-Error-excel('" + fileName + "'," + numSheet + ") don't open worksheet");
     }
+  }
+
+  /**
+   * Открыть рабочую книгу Excel и лист
+   * @param fileName  имя файла
+   * @param numSheet  индекс листа
+   * @return true - открыто, false - не открыто
+   */
+  boolean open(String fileName, int numSheet)
+  {
+    if( openWorkbook(fileName) ) {
+      return openSheet(numSheet);
+    }
+    return false;
   }
 
   /**
@@ -34,7 +49,7 @@ public class excel {
    * @param fileName  имя файла
    * @return true - открыто, false - не открыто
    */
-  boolean open(String fileName)
+  boolean openWorkbook(String fileName)
   {
     if(f_wbk != null) {
       System.err.println("?-Warning-open('" + fileName + "') workbook already open");
