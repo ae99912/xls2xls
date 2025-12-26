@@ -33,16 +33,19 @@ package ae;
  16.09.25 свойство ячейки @blank, когда требуется очистка выходной ячейки
           добавил функцию setCellBlank
  19.11.25 новая программа для записи строки в указанную ячейку str2xls (MainStr)
+ 26.12.25 логика обработки строк, признак regex - @@
 
 */
 
 public class R {
-    public final static String Ver = "Ver. 6.1"; // номер версии
+    public final static String Ver = "Ver. 7.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
     // свойство очистки выходной ячейки
-    public final static String PAT_BLANK = "blank";
+    public final static String PAT_BLANK    = "blank";
+    public final static String Name_regex   = "@";    // имя свойства "регулярное выражение" @@
+
     static boolean debug = false;   // отладочный вывод
 
     /**

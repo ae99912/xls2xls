@@ -25,7 +25,6 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class Main {
-  final static String Name_regex = "regex";    // имя свойства "регулярное выражение"
   public static void main(String[] args) {
     //
     int ia = 0;
@@ -97,19 +96,19 @@ public class Main {
       // свойство данной ячейки
       switch (ya.prop) {
         case "only01":
-          strPattern = "[01](\\.0)?";        // только 0 или 1 (целое число завершается .0 , а запятых нет)
+          strPattern = "[01](\\.0)?";         // только 0 или 1 (целое число завершается .0 , а запятых нет)
           break;
 
         case "only-01":
-          strPattern = "[-01](\\.0)?";       // только - или 0 или 1
+          strPattern = "[-01](\\.0)?";        // только - или 0 или 1
           break;
 
         case "onlyint":
-          strPattern = "-?[0-9]+(\\.0)?";    // только целые
+          strPattern = "-?[0-9]+(\\.0)?";     // только целые
           break;
 
         case "onlynum":
-          strPattern = "-?[0-9]+\\.?[0-9]*";   // только числа (целые и действительные)
+          strPattern = "-?[0-9]+\\.?[0-9]*";  // только числа (целые и действительные)
           break;
 
         case R.PAT_BLANK:
@@ -117,31 +116,34 @@ public class Main {
           break;
 
         default:
-          if(ya.prop.startsWith(Name_regex)) {    // это свойство "регулярное выражение"?
+          if(ya.prop.startsWith(R.Name_regex)) {    // это свойство "регулярное выражение"?
             // строка после имени свойства - само регулярное выражение
-            strPattern = ya.prop.substring(Name_regex.length());
+            strPattern = ya.prop.substring(R.Name_regex.length());
           } else {
             strPattern = null;  // нет свойства - паттерн пустой
           }
           break;
       }
+      // выходная ячейка
+      Cell cellOut = eOut.getCell(r,c);
       // определено ли регулярное выражение для проверки соответствия значения в ячейке?
       if(strPattern != null) {
         if(strPattern.compareTo(R.PAT_BLANK)==0) {
           // требуется очистка выходной ячейки
           // при этом содержимое входного файла неважно
-          if(eOut.setCellBlank(r, c)) {
-            count++;  // считаем переносы значений
-          }
+          cellOut.setCellType(Cell.CELL_TYPE_BLANK);
+          count++;  // считаем переносы значений
           continue;
         }
-        String sy = excel.getCellStrValue(cell);    // значение ячейки
+        // значение string
+        String sy = excel.getText(cell);
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
         if(!mat.matches())  // сравнивает ВСЮ строку с шаблоном
           continue;           // не соответствует шаблону - пропускаем
       }
-      if(eOut.setCellTo(cell, r, c)) {   // поместим ячейку в выходной Excel (строка, колонка)
+      //
+      if(excel.copyCell(cell, cellOut)) {   // поместим ячейку в выходной Excel (строка, колонка)
         count++;  // считаем переносы значений
       }
     }

@@ -12,6 +12,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
@@ -140,102 +142,6 @@ public class excel {
   }
 
   /**
-   * записать в ячейку таблицы значение по указанной ячейке
-   * @param cell  ячейка, откуда берется значение
-   * @param irow  строка ячейки, куда помещаем значение входной ячейки
-   * @param icol  колонка ячейки
-   * @return  результат записи - было записано значение или нет
-   */
-  boolean setCellTo(Cell cell, int irow, int icol)
-  {
-    try {
-      Cell c = getCell(irow, icol);
-      int type = cell.getCellType();  // тип ячейки
-      if(type == Cell.CELL_TYPE_FORMULA) {
-        // если формула, то поставим ее значение
-        type = cell.getCachedFormulaResultType();
-        R.out("?-Warning-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ") formula: " + cell.getCellFormula());
-      }
-      boolean r = setCellTypeContent(cell, type, c);
-      R.out("setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")");
-      return r;
-    } catch (Exception e) {
-      System.err.println("?-Error-setCellTo(" + getCellStrValue(cell) + ", " + irow + "," + icol + ")-error set value. " + e.getMessage());
-      return false;
-    }
-  }
-
-  /**
-   * Установить в ячейку пустое значение BLANK
-   * @param irow строка ячейки
-   * @param icol колонка ячейки
-   * @return результат записи - было записано значение или нет
-   */
-  boolean setCellBlank(int irow, int icol)
-  {
-    try {
-      Cell c = getCell(irow, icol);
-      // c.setCellValue(" ");
-      c.setCellType(Cell.CELL_TYPE_BLANK);
-      R.out("setCellBlank(" + irow + "," + icol + ")");
-      return true;
-    } catch (Exception e) {
-      System.err.println("?-Error-setCellBlank(" + irow + "," + icol + ")-error set value. " + e.getMessage());
-      return false;
-    }
-
-  }
-
-  /**
-   * Задает значение выходной ячейки по входной ячейке и ее типу.
-   * Используется для записи копий значений или значений формулы
-   * https://stackoverflow.com/questions/62305485/how-to-get-function-expression-apache-poi
-   * @param cell    входная ячейка (может быть с формулой)
-   * @param type    тип вычисленного значения для выходной ячейки
-   * @param cellOut выходная ячейка
-   * @return строка значения
-   */
-  private static boolean setCellTypeContent(Cell cell, int type, Cell cellOut) {
-    switch (type) {
-      case Cell.CELL_TYPE_STRING:
-        //System.out.println("String: " + cell.getRichStringCellValue().getString());
-        cellOut.setCellValue(cell.getRichStringCellValue().getString());
-        break;
-
-      case Cell.CELL_TYPE_NUMERIC:
-        if (DateUtil.isCellDateFormatted(cell)) {
-          //System.out.println("Date: " + cell.getDateCellValue());
-          cellOut.setCellValue(cell.getDateCellValue());
-        } else {
-          //System.out.println("Number: " + cell.getNumericCellValue());
-          cellOut.setCellValue(cell.getNumericCellValue());
-        }
-        break;
-
-      case Cell.CELL_TYPE_BOOLEAN:
-        //System.out.println("Boolean: " + cell.getBooleanCellValue());
-        cellOut.setCellValue(cell.getBooleanCellValue());
-        break;
-
-      case Cell.CELL_TYPE_FORMULA:
-        //System.out.print("Formula result is ");
-        cellOut.setCellValue("recursive formula");
-        break;
-
-      case Cell.CELL_TYPE_BLANK:
-        // System.out.println("Blank cell.");
-        // не изменяем выходную ячейку - cellOut.setCellValue("");
-        return false;
-
-      default:
-        System.err.println("?-Warning-setCellTypeContent(...," + type + ",...). This should not have happened.");
-        return false;
-
-    }
-    return true;
-  }
-
-  /**
    * Получить ячейку в строке в заданной колонке
    * @param irow   строка
    * @param icol   колонка
@@ -265,76 +171,75 @@ public class excel {
   }
 
   /**
-   * Получить из ячейки число
-   * @param irow  строка
-   * @param icol  колонка
-   * @return действительное число, если ячейка есть и в ней число, либо null
+   * выдать текстовое содержание ячейки
+   * @param cell ячейка
+   * @return  строка содержимого
    */
-  Double getCellNumeric(int irow, int icol)
+  static String getText(Cell cell)
   {
-    Double dbl = null;
-    Cell c = getCell(irow, icol);
-    if(c != null) {
-      if (c.getCellType() == Cell.CELL_TYPE_NUMERIC) {  // numeric 0
-        dbl = c.getNumericCellValue();
-      }
-    }
-    return dbl;
-  }
-
-  String  getCellString(int irow, int icol)
-  {
-    String str = null;
-    Cell c = getCell(irow, icol);
-    if(c != null) {
-      str = getCellStrValue(c);
-    }
+    DataFormatter formatter = new DataFormatter();
+    String str = formatter.formatCellValue(cell);
     return str;
   }
 
-  public static String  getCellStrValue(Cell cell)
+  /**
+   * Копировать входную ячейку в выходную, взяв результат формулы
+   * @param inpCell входная ячейка
+   * @param outCell выходная ячейка
+   * @return true если копирование выполнено
+   */
+  static boolean copyCell(Cell inpCell, Cell outCell)
   {
-    if(cell == null)
-      return "null";
-    return getCellStrValue(cell.getCellType(), cell);
-  }
+    try {
+      int type = inpCell.getCellType();
+      // значение string
+      switch (type) {
+        case Cell.CELL_TYPE_FORMULA:
+          int typeo = inpCell.getCachedFormulaResultType();
+          inpCell.setCellType(typeo);
+          return copyCell(inpCell, outCell);
 
-  public static String  getCellStrValue(int type, Cell cell)
-  {
-    if(cell == null)
-      return "null";
-    switch (type) { // тип ячейки
-      // строка
-      case Cell.CELL_TYPE_STRING:
-        return cell.getStringCellValue();
+        case Cell.CELL_TYPE_BLANK:
+          outCell.setCellType(Cell.CELL_TYPE_BLANK);
+          break;
 
-      // число
-      case Cell.CELL_TYPE_NUMERIC:
-        return "" + cell.getNumericCellValue();
-      // break;
+        case Cell.CELL_TYPE_STRING:
+          outCell.setCellValue(inpCell.getStringCellValue());
+          break;
 
-      case Cell.CELL_TYPE_BOOLEAN:
-        return "" + cell.getBooleanCellValue();
+        case Cell.CELL_TYPE_BOOLEAN:
+          outCell.setCellValue(inpCell.getBooleanCellValue());
+          break;
 
-      // формула
-      case Cell.CELL_TYPE_FORMULA:
-        //return "=" + cell.getCellFormula();
-        // если формула, то поставим ее значение
-        int typeres = cell.getCachedFormulaResultType();
-        return getCellStrValue(typeres, cell);
+        case Cell.CELL_TYPE_NUMERIC:
+          if (DateUtil.isCellDateFormatted(inpCell)) {
+            String str = getText(inpCell);
+            // проверим на дату
+            String rx = "([0-2]{1,2})\\/([0-9]{1,2})\\/([0-9]{2})";
+            Pattern pat = Pattern.compile(rx);
+            Matcher mat = pat.matcher(str);
+            if(mat.find()) {
+              // найдена дата
+              int m,d,y;
+              m = Integer.parseInt(mat.group(1));
+              d = Integer.parseInt(mat.group(2));
+              y = Integer.parseInt(mat.group(3));
+              str = String.format("%02d.%02d.%04d", d,m,2000+y);
+            }
+            outCell.setCellValue(str);  // запишем строковое значение
+          } else {
+            outCell.setCellValue(inpCell.getNumericCellValue());
+          }
+          break;
 
-      // бланк
-      case Cell.CELL_TYPE_BLANK:
-        return "<blank>";
-
-      // ошибка
-      case Cell.CELL_TYPE_ERROR:
-        return "<error>";
-
+        default:
+          return false;
+      }
+    } catch (Exception e) {
+      System.err.println("?-error-copyCell(): " + e.getMessage());
     }
-    return "<...>";
+    return true;
   }
-
 
 } // end of class
 
