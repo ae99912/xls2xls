@@ -12,6 +12,8 @@ import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
 import java.io.*;
 import java.nio.file.Files;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -190,53 +192,61 @@ public class excel {
    */
   static boolean copyCell(Cell inpCell, Cell outCell)
   {
+    final String copycell = "copyCell(" + inpCell.getAddress() + ", " + outCell.getAddress() + ") ";
     try {
       int type = inpCell.getCellType();
       // значение string
       switch (type) {
         case Cell.CELL_TYPE_FORMULA:
           int typeo = inpCell.getCachedFormulaResultType();
+          R.out(copycell + "formula: " + inpCell.getCellFormula());
           inpCell.setCellType(typeo);
           return copyCell(inpCell, outCell);
 
         case Cell.CELL_TYPE_BLANK:
+          R.out(copycell + "blank");
           outCell.setCellType(Cell.CELL_TYPE_BLANK);
           break;
 
         case Cell.CELL_TYPE_STRING:
+          R.out(copycell + "string: " + inpCell.getStringCellValue());
           outCell.setCellValue(inpCell.getStringCellValue());
           break;
 
         case Cell.CELL_TYPE_BOOLEAN:
+          R.out(copycell + "boolean: " + inpCell.getBooleanCellValue());
           outCell.setCellValue(inpCell.getBooleanCellValue());
           break;
 
         case Cell.CELL_TYPE_NUMERIC:
+          String str;
           if (DateUtil.isCellDateFormatted(inpCell)) {
-            String str = getText(inpCell);
+            str = getText(inpCell);
             // проверим на дату
-            String rx = "([0-2]{1,2})\\/([0-9]{1,2})\\/([0-9]{2})";
-            Pattern pat = Pattern.compile(rx);
-            Matcher mat = pat.matcher(str);
+            // паттерн для поиска даты Excel 12/27/26 (m/d/y)
+            Pattern spat = Pattern.compile("([0-9]{1,2})\\/([0-9]{1,2})\\/([0-9]{2})");
+            Matcher mat = spat.matcher(str);
             if(mat.find()) {
               // найдена дата
-              int m,d,y;
-              m = Integer.parseInt(mat.group(1));
-              d = Integer.parseInt(mat.group(2));
-              y = Integer.parseInt(mat.group(3));
-              str = String.format("%02d.%02d.%04d", d,m,2000+y);
+              Date dat = inpCell.getDateCellValue();
+              SimpleDateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy"); // "dd.MM.yyyy HH:mm:ss"
+              str = dateformat.format(dat);
             }
             outCell.setCellValue(str);  // запишем строковое значение
           } else {
+            str = String.valueOf(inpCell.getNumericCellValue());
             outCell.setCellValue(inpCell.getNumericCellValue());
           }
+          R.out(copycell + "numeric: " + inpCell.getNumericCellValue() + " (" + str + ")");
           break;
 
         default:
+          R.out(copycell + "unknown type: " + type);
           return false;
       }
     } catch (Exception e) {
-      System.err.println("?-error-copyCell(): " + e.getMessage());
+      R.out("?-Error-" + copycell + "- " + e.getMessage());
+      return false;
     }
     return true;
   }

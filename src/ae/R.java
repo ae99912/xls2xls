@@ -34,11 +34,12 @@ package ae;
           добавил функцию setCellBlank
  19.11.25 новая программа для записи строки в указанную ячейку str2xls (MainStr)
  26.12.25 логика обработки строк, признак regex - @@
+ 27.12.25 разбор ячейки с датой
 
 */
 
 public class R {
-    public final static String Ver = "Ver. 7.2"; // номер версии
+    public final static String Ver = "Ver. 7.3"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

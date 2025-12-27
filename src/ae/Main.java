@@ -143,7 +143,7 @@ public class Main {
           continue;           // не соответствует шаблону - пропускаем
       }
       //
-      if(excel.copyCell(cell, cellOut)) {   // поместим ячейку в выходной Excel (строка, колонка)
+      if(excel.copyCell(cell, cellOut)) {   // копируем значение ячейки в ячейку выходного Excel
         count++;  // считаем переносы значений
       }
     }
