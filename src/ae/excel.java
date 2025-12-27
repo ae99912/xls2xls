@@ -173,6 +173,21 @@ public class excel {
   }
 
   /**
+   * выполним принудительно перерасчет всех формул в рабочей книге
+   */
+  void calculate()
+  {
+    if(f_wbk == null) {
+      System.err.println("?-Error-excel.calculate() don't open Excel");
+    }
+    // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
+    // перерасчет всех формул на листе
+    // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
+    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
+    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
+  }
+
+  /**
    * выдать текстовое содержание ячейки
    * @param cell ячейка
    * @return  строка содержимого
@@ -251,12 +266,12 @@ public class excel {
     return true;
   }
 
+
 } // end of class
 
   /*
 
    // выполним принудительно перерасчет всех формул в рабочей книге
-
   void calculate()
   {
     if(f_wbk == null) {

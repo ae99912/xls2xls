@@ -16,6 +16,23 @@ Modify
   09.11.23 указывается номер листа
  */
 
+/*
+  Заполнение выходного Excel по карте
+  A1:G10
+  F24
+
+  спец обработка (свойства)
+  @only01   дальше заносим только 0 или 1
+  @only-01  дальше заносим только 0, 1 или -1
+  @onlyint  дальше заносим только целые числа
+  @onlynum  дальше заносим только числа действительные или целые
+  @all      дальше заносим что угодно
+
+  @b       - дальше ячейки, которые очищаются
+  @@regexp - дальше заносим ячейки если они соответствуют regexp
+  @=строка - дальше в ячейки заносится "строка"
+
+ */
 package ae;
 
 import org.apache.poi.ss.usermodel.*;
@@ -89,10 +106,12 @@ public class Main {
       int r = ya.irow - 1;    // индекс строки ячейки
       int c = ya.icol - 1;    // индекс столбца ячейки
       //
-      Cell cell = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
+      Cell cellInp  = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
+      Cell cellOut  = eOut.getCell(r,c);    // выходная ячейка
       //
-      // строка паттерна регулярного выражения
-      String strPattern;
+      boolean isBlank     = false;  // нет очистки содержимого ячейки
+      String  strPattern  = null;   // нет паттерна проверки значения
+      String  strInsert   = null;   // нет строки вставки
       // свойство данной ячейки
       switch (ya.prop) {
         case "only01":
@@ -111,43 +130,64 @@ public class Main {
           strPattern = "-?[0-9]+\\.?[0-9]*";  // только числа (целые и действительные)
           break;
 
-        case R.PAT_BLANK:
-          strPattern = R.PAT_BLANK;  // паттерн для обнуления содержимого целевой ячейки
+        case "all":
           break;
 
         default:
-          if(ya.prop.startsWith(R.Name_regex)) {    // это свойство "регулярное выражение"?
-            // строка после имени свойства - само регулярное выражение
-            strPattern = ya.prop.substring(R.Name_regex.length());
-          } else {
-            strPattern = null;  // нет свойства - паттерн пустой
+          if (ya.prop.length() > 1) {
+            String s = ya.prop.substring(0, 1);  // буква свойства
+            switch (s) {
+              case R.PAT_REGEX:
+                strPattern = ya.prop.substring(R.PAT_STRING.length());
+                break;
+
+              case R.PAT_BLANK:
+                isBlank = true;
+                break;
+
+              case R.PAT_STRING:
+                strInsert = ya.prop.substring(R.PAT_STRING.length());  // строка для вставки
+                break;
+
+              default:
+                System.err.println("?-warning-неправильное свойство: " + ya.prop);
+                continue;
+            }
           }
           break;
       }
-      // выходная ячейка
-      Cell cellOut = eOut.getCell(r,c);
+      // начнем запись в выходную ячейку
+      // задана очистка?
+      if(isBlank) {
+        cellOut.setCellType(Cell.CELL_TYPE_BLANK);
+        R.out(cellOut.getAddress() + " - blank");
+        count++;  // считаем переносы значений
+        continue;
+      }
+      // определена строка для вставки?
+      if(strInsert != null) {
+        cellOut.setCellValue(strInsert);
+        R.out(cellOut.getAddress() + " - insert: " + strInsert);
+        count++;  // вставляем строку в ячейку
+        continue;
+      }
       // определено ли регулярное выражение для проверки соответствия значения в ячейке?
-      if(strPattern != null) {
-        if(strPattern.compareTo(R.PAT_BLANK)==0) {
-          // требуется очистка выходной ячейки
-          // при этом содержимое входного файла неважно
-          cellOut.setCellType(Cell.CELL_TYPE_BLANK);
-          count++;  // считаем переносы значений
-          continue;
-        }
+      if(null != strPattern) {
         // значение string
-        String sy = excel.getText(cell);
+        String sy = excel.getText(cellInp);
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
         if(!mat.matches())  // сравнивает ВСЮ строку с шаблоном
           continue;           // не соответствует шаблону - пропускаем
       }
-      //
-      if(excel.copyCell(cell, cellOut)) {   // копируем значение ячейки в ячейку выходного Excel
+      if(excel.copyCell(cellInp, cellOut)) {   // копируем значение ячейки в ячейку выходного Excel
         count++;  // считаем переносы значений
       }
     }
-    //
+    // выполним вычисления формул, если была запись в ячейки
+    if(count > 0) {
+      eOut.calculate();
+    }
     if( !eOut.write(outFile) ) {
       System.err.println("?-Error-don't write: " + outFile);
     }
@@ -162,7 +202,18 @@ public class Main {
       "Help about program:\n" +
       "> xls2xls [-v] [-s 0]  Karta.txt  Input.XLSX  Output.XLSX\n" +
           "-v   отладочный вывод\n" +
-          "-s 0 обрабатываемый лист (sheet) 0, 1 и т.д. всех файлов";
+          "-s 0 обрабатываемый лист (sheet) 0, 1 и т.д. всех файлов\n" +
+              "\n" +
+              "спец обработка (свойства):\n" +
+              "  @only01   дальше заносим только 0 или 1\n" +
+              "  @only-01  дальше заносим только 0, 1 или -1\n" +
+              "  @onlyint  дальше заносим только целые числа\n" +
+              "  @onlynum  дальше заносим только числа действительные или целые\n" +
+              "  @all      дальше заносим что угодно\n" +
+              "\n" +
+              "  @b       - дальше ячейки, которые очищаются\n" +
+              "  @@regexp - дальше заносим ячейки если они соответствуют regexp\n" +
+              "  @=строка - дальше в ячейки заносим \"строка\"";
 
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";
