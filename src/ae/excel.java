@@ -224,8 +224,8 @@ public class excel {
             str = getText(inpCell);
             // проверим на дату
             // паттерн для поиска даты Excel 12/27/26 (m/d/y)
-            Pattern spat = Pattern.compile("([0-9]{1,2})\\/([0-9]{1,2})\\/([0-9]{2})");
-            Matcher mat = spat.matcher(str);
+            Pattern pat = Pattern.compile("([0-9]{1,2})/([0-9]{1,2})/([0-9]{2})");
+            Matcher mat = pat.matcher(str);
             if(mat.find()) {
               // найдена дата
               Date dat = inpCell.getDateCellValue();
