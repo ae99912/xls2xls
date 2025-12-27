@@ -27,8 +27,8 @@ Modify
   @onlyint  дальше заносим только целые числа
   @onlynum  дальше заносим только числа действительные или целые
   @all      дальше заносим что угодно
+  @blank    дальше ячейки, которые очищаются
 
-  @b       - дальше ячейки, которые очищаются
   @@regexp - дальше заносим ячейки если они соответствуют regexp
   @=строка - дальше в ячейки заносится "строка"
 
@@ -130,22 +130,22 @@ public class Main {
           strPattern = "-?[0-9]+\\.?[0-9]*";  // только числа (целые и действительные)
           break;
 
-        case "all":
+        case R.CELL_BLANK:
+          isBlank = true;                     // очистка ячейки
+          break;
+
+        case R.CELL_ALL:                      // любое значение
           break;
 
         default:
           if (ya.prop.length() > 1) {
             String s = ya.prop.substring(0, 1);  // буква свойства
             switch (s) {
-              case R.PAT_REGEX:
+              case R.PAT_REGEX:               // регулярное выражение
                 strPattern = ya.prop.substring(R.PAT_STRING.length());
                 break;
 
-              case R.PAT_BLANK:
-                isBlank = true;
-                break;
-
-              case R.PAT_STRING:
+              case R.PAT_STRING:              // строка вставки в ячейку
                 strInsert = ya.prop.substring(R.PAT_STRING.length());  // строка для вставки
                 break;
 
@@ -210,10 +210,10 @@ public class Main {
               "  @onlyint  дальше заносим только целые числа\n" +
               "  @onlynum  дальше заносим только числа действительные или целые\n" +
               "  @all      дальше заносим что угодно\n" +
+              "  @blank    дальше ячейки, которые очищаются\n" +
               "\n" +
-              "  @b       - дальше ячейки, которые очищаются\n" +
               "  @@regexp - дальше заносим ячейки если они соответствуют regexp\n" +
-              "  @=строка - дальше в ячейки заносим \"строка\"";
+              "  @=строка - дальше в ячейки заносится \"строка\"";
 
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";
