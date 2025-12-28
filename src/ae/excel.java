@@ -128,8 +128,8 @@ public class excel {
       FileOutputStream ftmpout = new FileOutputStream(tempFile);
       f_wbk.write(ftmpout);
       ftmpout.close();
-      // если после записи во временный файл его длина больше 1 кБ, то запишем в выходной файл
-      if(tempFile.length() > 1024) {
+      // если после записи во временный файл его длина больше порога, то запишем в выходной файл
+      if(tempFile.length() > 512) {
         File f = new File(fileName);
         // копирование файла
         // https://javadevblog.com/kak-skopirovat-fajl-v-java-4-sposoba-primery-i-kod.html
@@ -194,11 +194,14 @@ public class excel {
    */
   static String getText(Cell cell)
   {
+    // https://www.baeldung.com/java-apache-poi-cell-string-value
     DataFormatter formatter = new DataFormatter();
-    String str = formatter.formatCellValue(cell);
-    return str;
+    return formatter.formatCellValue(cell);
   }
 
+  // паттерн для проверки формата даты Excel m/d/yy
+  // https://www.baeldung.com/java-apache-poi-date-format
+  static Pattern f_pat_date = Pattern.compile("[0-9]{1,2}/[0-9]{1,2}/[0-9]{2}");
   /**
    * Копировать входную ячейку в выходную, взяв результат формулы
    * @param inpCell входная ячейка
@@ -207,7 +210,7 @@ public class excel {
    */
   static boolean copyCell(Cell inpCell, Cell outCell)
   {
-    final String copycell = "copyCell(" + inpCell.getAddress() + ", " + outCell.getAddress() + ") ";
+    final String copycell = inpCell.getAddress() + " ";
     try {
       int type = inpCell.getCellType();
       // значение string
@@ -224,7 +227,7 @@ public class excel {
           break;
 
         case Cell.CELL_TYPE_STRING:
-          R.out(copycell + "string: " + inpCell.getStringCellValue());
+          R.out(copycell + "string : " + inpCell.getStringCellValue());
           outCell.setCellValue(inpCell.getStringCellValue());
           break;
 
@@ -234,23 +237,20 @@ public class excel {
           break;
 
         case Cell.CELL_TYPE_NUMERIC:
-          String str;
-          if (DateUtil.isCellDateFormatted(inpCell)) {
-            str = getText(inpCell);
-            // проверим на дату
-            // паттерн для поиска даты Excel 12/27/26 (m/d/y)
-            Pattern pat = Pattern.compile("([0-9]{1,2})/([0-9]{1,2})/([0-9]{2})");
-            Matcher mat = pat.matcher(str);
+          String str = getText(inpCell);  // текстовое содержимое ячейки
+          // проверим на дату
+          if(DateUtil.isCellDateFormatted(inpCell)) {
+            // паттерн для поиска даты Excel 12/27/25 (m/d/yy) [0-9]{1,2}/[0-9]{1,2}/[0-9]{2}
+            Matcher mat = f_pat_date.matcher(str);
             if(mat.find()) {
               // найдена дата
               Date dat = inpCell.getDateCellValue();
               SimpleDateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy"); // "dd.MM.yyyy HH:mm:ss"
               str = dateformat.format(dat);
             }
-            outCell.setCellValue(str);  // запишем строковое значение
+            outCell.setCellValue(str);  // запишем строковое значение время или даты
           } else {
-            str = String.valueOf(inpCell.getNumericCellValue());
-            outCell.setCellValue(inpCell.getNumericCellValue());
+            outCell.setCellValue(inpCell.getNumericCellValue());  // запишем именно numeric
           }
           R.out(copycell + "numeric: " + inpCell.getNumericCellValue() + " (" + str + ")");
           break;
@@ -266,21 +266,4 @@ public class excel {
     return true;
   }
 
-
 } // end of class
-
-  /*
-
-   // выполним принудительно перерасчет всех формул в рабочей книге
-  void calculate()
-  {
-    if(f_wbk == null) {
-      System.err.println("?-Error-excel.calculate() don't open Excel");
-    }
-    // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
-    // перерасчет всех формул на листе
-    // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
-    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
-    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
-  }
-  */

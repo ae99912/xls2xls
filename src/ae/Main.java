@@ -86,8 +86,7 @@ public class Main {
     //
     // начнем обработку
     //
-    R.out("xls2xls " + R.Ver);
-    R.out("sheet: " + sheet);
+    R.out("xls2xls " + R.Ver + "   sheet: " + sheet);
     //
     String kartaFile  = aaa[0];
     String inpFile    = aaa[1];
@@ -115,11 +114,11 @@ public class Main {
       // свойство данной ячейки
       switch (ya.prop) {
         case "only01":
-          strPattern = "[01](\\.0)?";         // только 0 или 1 (целое число завершается .0 , а запятых нет)
+          strPattern = "[01](\\.0)?";         // только 0 или 1 (целое число завершается .0, а запятых нет)
           break;
 
         case "only-01":
-          strPattern = "[-01](\\.0)?";        // только - или 0 или 1
+          strPattern = "[-01](\\.0)?";        // только '-', или 0, или 1
           break;
 
         case "onlyint":
@@ -142,15 +141,15 @@ public class Main {
             String s = ya.prop.substring(0, 1);  // буква свойства
             switch (s) {
               case R.PAT_REGEX:               // регулярное выражение
-                strPattern = ya.prop.substring(R.PAT_STRING.length());
+                strPattern = ya.prop.substring(R.PAT_INSTR.length());
                 break;
 
-              case R.PAT_STRING:              // строка вставки в ячейку
-                strInsert = ya.prop.substring(R.PAT_STRING.length());  // строка для вставки
+              case R.PAT_INSTR:              // строка вставки в ячейку
+                strInsert = ya.prop.substring(R.PAT_INSTR.length());  // строка для вставки
                 break;
 
               default:
-                System.err.println("?-warning-неправильное свойство: " + ya.prop);
+                System.err.println("?-warning-неправильное свойство: @" + ya.prop);
                 continue;
             }
           }
@@ -165,9 +164,9 @@ public class Main {
         continue;
       }
       // определена строка для вставки?
-      if(strInsert != null) {
+      if(null != strInsert) {
         cellOut.setCellValue(strInsert);
-        R.out(cellOut.getAddress() + " - insert: " + strInsert);
+        R.out(cellOut.getAddress() + " =строка: " + strInsert);
         count++;  // вставляем строку в ячейку
         continue;
       }
@@ -184,12 +183,13 @@ public class Main {
         count++;  // считаем переносы значений
       }
     }
-    // выполним вычисления формул, если была запись в ячейки
+    // если была запись в ячейки, то
     if(count > 0) {
-      eOut.calculate();
-    }
-    if( !eOut.write(outFile) ) {
-      System.err.println("?-Error-don't write: " + outFile);
+      eOut.calculate();             // выполним вычисления формул
+      //
+      if (!eOut.write(outFile)) {   // запись выходного файла
+        System.err.println("?-Error-don't write: " + outFile);
+      }
     }
     eInp.close();
     eOut.close();

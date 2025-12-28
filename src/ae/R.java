@@ -39,7 +39,7 @@ package ae;
 */
 
 public class R {
-    public final static String Ver = "Ver. 8.1"; // номер версии
+    public final static String Ver = "v.8.1"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
@@ -47,7 +47,7 @@ public class R {
     public final static String CELL_ALL     = "all";    // имя свойства - любое значение ячейки
     public final static String CELL_BLANK   = "blank";  // имя свойства blank - очистка ячейки
     public final static String PAT_REGEX    = "@";      // имя свойства "регулярное выражение" @@
-    public final static String PAT_STRING   = "=";      // свойство "строка", которая записывается в массив
+    public final static String PAT_INSTR    = "=";      // свойство "строка", которая записывается в ячейки
 
     static boolean debug = false;   // отладочный вывод
 
