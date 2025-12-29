@@ -35,18 +35,19 @@ package ae;
  19.11.25 новая программа для записи строки в указанную ячейку str2xls (MainStr)
  26.12.25 логика обработки строк, признак regex - @@
  27.12.25 разбор ячейки с датой, вставка строки в ячейку (@=строка для вставки), перерасчет формул
+ 29.12.25 удалил свойство @only-01
 
 */
 
 public class R {
-    public final static String Ver = "v.8.1"; // номер версии
+    public final static String Ver = "v.8.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
     // свойства выходной ячейки
-    public final static String CELL_ALL     = "all";    // имя свойства - любое значение ячейки
-    public final static String CELL_BLANK   = "blank";  // имя свойства blank - очистка ячейки
-    public final static String PAT_REGEX    = "@";      // имя свойства "регулярное выражение" @@
+    public final static String CELL_ALL     = "all";    // свойство любое значение ячейки
+    public final static String CELL_BLANK   = "blank";  // свойство blank - очистка ячейки
+    public final static String PAT_REGEX    = "@";      // свойство "регулярное выражение" @@
     public final static String PAT_INSTR    = "=";      // свойство "строка", которая записывается в ячейки
 
     static boolean debug = false;   // отладочный вывод

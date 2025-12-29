@@ -1,42 +1,41 @@
 /*
  * Copyright (c) 2023. AE
- * 2023-07-11
+ * 11.07.2023
  *
+ * Modify:
+ * 09.11.23 указывается номер листа
+ * 26.12.25 обработка ячейки с датой
+ * 27.12.25 вставка строки в ячейку
+ * 29.12.25 удалил свойство @only-01, оптимизация чтения входной строки
+*/
+
+/*
  * копирование значений ячеек (не пустых) из одного файла Excel 2010 в другой
- * на основе карты переноса:
+ * на основе карты переноса.
  *   # пример карты
  *   C53:F56
- *   C53
- *   C99:F99
- *   C110:F110
+ *   D51
+ * спец обработка (свойства):
+ *   @only01   дальше заносим только 0 или 1
+ *   @onlyint  дальше заносим только целые числа
+ *   @onlynum  дальше заносим только числа действительные или целые
+ *   @all      дальше заносим что угодно
+ *   @blank    дальше ячейки, которые очищаются
+ *   @@regexp  дальше заносим ячейки если они соответствуют regexp
+ *   @=строка  дальше в ячейки заносится "строка"
  */
 
 /*
-Modify
+Modify:
   09.11.23 указывается номер листа
+  26.12.25 обработка ячейки с датой
+  27.12.25 вставка строки в ячейку
+  29.12.25 удалил свойство @only-01, оптимизация чтения входной строки
  */
 
-/*
-  Заполнение выходного Excel по карте
-  A1:G10
-  F24
-
-  спец обработка (свойства)
-  @only01   дальше заносим только 0 или 1
-  @only-01  дальше заносим только 0, 1 или -1
-  @onlyint  дальше заносим только целые числа
-  @onlynum  дальше заносим только числа действительные или целые
-  @all      дальше заносим что угодно
-  @blank    дальше ячейки, которые очищаются
-
-  @@regexp - дальше заносим ячейки если они соответствуют regexp
-  @=строка - дальше в ячейки заносится "строка"
-
- */
 package ae;
 
 import org.apache.poi.ss.usermodel.*;
-
 import java.util.Set;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -45,52 +44,45 @@ public class Main {
   public static void main(String[] args) {
     //
     int ia = 0;
-    String[] aaa = new String[3];  // карта входнойфайл выходнойфайл
-    int   sheet = 0;  // номер листа для обработки
-
-    for(int i = 0; i < args.length; i++) {
-      String key = args[i];
-
-      switch (key) {
-        case "-?":
-          System.out.println(HelpMessage);
-          return;
-          //break;
-
-        case "-v":  // отладочный вывод
-          R.debug = true;
-          break;
-
-        case "-s":  // номер sheet (листа)
-          i++;
-          try {
-            sheet = Integer.parseInt(args[i]);  // номер
-          } catch (Exception e) {
-            System.err.println(ErrMessage);
+    String[] aaa = new String[3];  // карта входной_файл выходной_файл
+    int sheet = 0;  // номер листа для обработки
+    try {
+      for (int i = 0; i < args.length; i++) {
+        String arg = args[i];
+        switch (arg) {
+          case "-?":
+            System.out.println(HelpMessage);
             return;
-          }
-          break;
 
-        default:
-          // параметр входной строки
-          if(ia < aaa.length) {
-            aaa[ia++] = key;
-          }
-          break;
+          case "-v":  // отладочный вывод
+            R.debug = true;
+            break;
+
+          case "-s":  // номер sheet (листа)
+            i++;
+            sheet = Integer.parseInt(args[i]);  // номер листа
+            break;
+
+          default:
+            // параметр входной строки
+            aaa[ia++] = arg;
+            break;
+        }
       }
-    }
-    if ( ia != aaa.length )  {
+      if(aaa.length != ia) throw new IllegalArgumentException();  // недостаточно аргументов
+      //
+    } catch (Exception e) {
       System.err.println(ErrMessage);
-      return;
+      System.exit(10);
     }
     //
     // начнем обработку
     //
     R.out("xls2xls " + R.Ver + "   sheet: " + sheet);
     //
-    String kartaFile  = aaa[0];
-    String inpFile    = aaa[1];
-    String outFile    = aaa[2];
+    String kartaFile = aaa[0];
+    String inpFile   = aaa[1];
+    String outFile   = aaa[2];
     //
     // объекты Excel
     excel eInp = new excel(inpFile, sheet);
@@ -105,20 +97,16 @@ public class Main {
       int r = ya.irow - 1;    // индекс строки ячейки
       int c = ya.icol - 1;    // индекс столбца ячейки
       //
-      Cell cellInp  = eInp.getCell(r, c);   // возьмем ячейку, согласно карте, во входном Excel
+      Cell cellInp  = eInp.getCell(r,c);    // возьмем ячейку, согласно карте, во входном Excel
       Cell cellOut  = eOut.getCell(r,c);    // выходная ячейка
       //
-      boolean isBlank     = false;  // нет очистки содержимого ячейки
-      String  strPattern  = null;   // нет паттерна проверки значения
-      String  strInsert   = null;   // нет строки вставки
+      boolean isBlank    = false;   // очистка содержимого ячейки
+      String  strPattern = null;    // паттерн проверки значения
+      String  strInsert  = null;    // строка вставки
       // свойство данной ячейки
       switch (ya.prop) {
         case "only01":
           strPattern = "[01](\\.0)?";         // только 0 или 1 (целое число завершается .0, а запятых нет)
-          break;
-
-        case "only-01":
-          strPattern = "[-01](\\.0)?";        // только '-', или 0, или 1
           break;
 
         case "onlyint":
@@ -141,10 +129,10 @@ public class Main {
             String s = ya.prop.substring(0, 1);  // буква свойства
             switch (s) {
               case R.PAT_REGEX:               // регулярное выражение
-                strPattern = ya.prop.substring(R.PAT_INSTR.length());
+                strPattern = ya.prop.substring(R.PAT_REGEX.length());
                 break;
 
-              case R.PAT_INSTR:              // строка вставки в ячейку
+              case R.PAT_INSTR:               // строка вставки в ячейку
                 strInsert = ya.prop.substring(R.PAT_INSTR.length());  // строка для вставки
                 break;
 
@@ -170,20 +158,20 @@ public class Main {
         count++;  // вставляем строку в ячейку
         continue;
       }
-      // определено ли регулярное выражение для проверки соответствия значения в ячейке?
+      // определено регулярное выражение для проверки соответствия значения в ячейке?
       if(null != strPattern) {
         // значение string
         String sy = excel.getText(cellInp);
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
         if(!mat.matches())  // сравнивает ВСЮ строку с шаблоном
-          continue;           // не соответствует шаблону - пропускаем
+          continue;   // не соответствует шаблону - пропускаем
       }
-      if(excel.copyCell(cellInp, cellOut)) {   // копируем значение ячейки в ячейку выходного Excel
-        count++;  // считаем переносы значений
+      if(excel.copyCell(cellInp, cellOut)) {  // копируем значение ячейки в ячейку выходного Excel
+        count++;      // считаем переносы значений
       }
     }
-    // если была запись в ячейки, то
+    // если была запись в ячейки
     if(count > 0) {
       eOut.calculate();             // выполним вычисления формул
       //
@@ -206,14 +194,12 @@ public class Main {
               "\n" +
               "спец обработка (свойства):\n" +
               "  @only01   дальше заносим только 0 или 1\n" +
-              "  @only-01  дальше заносим только 0, 1 или -1\n" +
               "  @onlyint  дальше заносим только целые числа\n" +
               "  @onlynum  дальше заносим только числа действительные или целые\n" +
               "  @all      дальше заносим что угодно\n" +
               "  @blank    дальше ячейки, которые очищаются\n" +
-              "\n" +
-              "  @@regexp - дальше заносим ячейки если они соответствуют regexp\n" +
-              "  @=строка - дальше в ячейки заносится \"строка\"";
+              "  @@regexp  дальше заносим ячейки если они соответствуют regexp\n" +
+              "  @=строка  дальше в ячейки заносится \"строка\"";
 
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";

@@ -10,13 +10,14 @@ package ae;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 
-import java.io.*;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.FileOutputStream;
 import java.nio.file.Files;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-
 import static java.nio.file.StandardCopyOption.REPLACE_EXISTING;
 
 public class excel {
@@ -129,7 +130,7 @@ public class excel {
       f_wbk.write(ftmpout);
       ftmpout.close();
       // если после записи во временный файл его длина больше порога, то запишем в выходной файл
-      if(tempFile.length() > 512) {
+      if(tempFile.length() > 1024) {
         File f = new File(fileName);
         // копирование файла
         // https://javadevblog.com/kak-skopirovat-fajl-v-java-4-sposoba-primery-i-kod.html
@@ -173,7 +174,7 @@ public class excel {
   }
 
   /**
-   * выполним принудительно перерасчет всех формул в рабочей книге
+   * Перерасчет всех формул в рабочей книге
    */
   void calculate()
   {
@@ -188,20 +189,17 @@ public class excel {
   }
 
   /**
-   * выдать текстовое содержание ячейки
+   * Получить текстовое содержание ячейки
    * @param cell ячейка
    * @return  строка содержимого
+   * https://www.baeldung.com/java-apache-poi-cell-string-value
    */
   static String getText(Cell cell)
   {
-    // https://www.baeldung.com/java-apache-poi-cell-string-value
     DataFormatter formatter = new DataFormatter();
     return formatter.formatCellValue(cell);
   }
 
-  // паттерн для проверки формата даты Excel m/d/yy
-  // https://www.baeldung.com/java-apache-poi-date-format
-  static Pattern f_pat_date = Pattern.compile("[0-9]{1,2}/[0-9]{1,2}/[0-9]{2}");
   /**
    * Копировать входную ячейку в выходную, взяв результат формулы
    * @param inpCell входная ячейка
@@ -210,7 +208,7 @@ public class excel {
    */
   static boolean copyCell(Cell inpCell, Cell outCell)
   {
-    final String copycell = inpCell.getAddress() + " ";
+    final String copycell = inpCell.getAddress() + " "; // для отладочного вывода
     try {
       int type = inpCell.getCellType();
       // значение string
@@ -227,7 +225,7 @@ public class excel {
           break;
 
         case Cell.CELL_TYPE_STRING:
-          R.out(copycell + "string : " + inpCell.getStringCellValue());
+          R.out(copycell + "string: " + inpCell.getStringCellValue());
           outCell.setCellValue(inpCell.getStringCellValue());
           break;
 
@@ -241,7 +239,9 @@ public class excel {
           // проверим на дату
           if(DateUtil.isCellDateFormatted(inpCell)) {
             // паттерн для поиска даты Excel 12/27/25 (m/d/yy) [0-9]{1,2}/[0-9]{1,2}/[0-9]{2}
-            Matcher mat = f_pat_date.matcher(str);
+            // https://www.baeldung.com/java-apache-poi-date-format
+            Pattern pat = Pattern.compile("[0-9]{1,2}/[0-9]{1,2}/[0-9]{2}");
+            Matcher mat = pat.matcher(str);
             if(mat.find()) {
               // найдена дата
               Date dat = inpCell.getDateCellValue();
