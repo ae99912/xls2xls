@@ -171,6 +171,7 @@ public class Main {
         count++;      // считаем переносы значений
       }
     }
+    R.out("Записано ячеек: " + count);
     // если была запись в ячейки
     if(count > 0) {
       eOut.calculate();             // выполним вычисления формул
@@ -181,8 +182,6 @@ public class Main {
     }
     eInp.close();
     eOut.close();
-    //
-    R.out("Записано ячеек: " + count);
   }
 
   private final static String HelpMessage =

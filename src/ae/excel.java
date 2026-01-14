@@ -202,6 +202,7 @@ public class excel {
 
   /**
    * Копировать входную ячейку в выходную, взяв результат формулы
+   * В случае пустого типа в исходной ячейке, копирование не выполняется
    * @param inpCell входная ячейка
    * @param outCell выходная ячейка
    * @return true если копирование выполнено
@@ -220,9 +221,10 @@ public class excel {
           return copyCell(inpCell, outCell);
 
         case Cell.CELL_TYPE_BLANK:
-          R.out(copycell + "blank");
-          outCell.setCellType(Cell.CELL_TYPE_BLANK);
-          break;
+          R.out(copycell + "blank don't copy");
+          // outCell.setCellType(Cell.CELL_TYPE_BLANK);
+          return false;
+          //break;
 
         case Cell.CELL_TYPE_STRING:
           R.out(copycell + "string: " + inpCell.getStringCellValue());
