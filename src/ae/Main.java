@@ -7,6 +7,8 @@
  * 26.12.25 обработка ячейки с датой
  * 27.12.25 вставка строки в ячейку
  * 29.12.25 удалил свойство @only-01, оптимизация чтения входной строки
+ * 22.01.26 обработка ячеек строго по порядку в тексте карты
+ *
 */
 
 /*
@@ -25,18 +27,10 @@
  *   @=строка  дальше в ячейки заносится "строка"
  */
 
-/*
-Modify:
-  09.11.23 указывается номер листа
-  26.12.25 обработка ячейки с датой
-  27.12.25 вставка строки в ячейку
-  29.12.25 удалил свойство @only-01, оптимизация чтения входной строки
- */
-
 package ae;
 
 import org.apache.poi.ss.usermodel.*;
-import java.util.Set;
+import java.util.ArrayList;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
@@ -90,15 +84,15 @@ public class Main {
     int count = 0;
     // карта ячеек для копирования
     karta k = new karta();
-    Set<yach> kar = k.open(kartaFile);
+    ArrayList<yach> kar = k.open(kartaFile);
     //
     // пройдемся по ячейкам карты
     for(yach ya: kar) {
       int r = ya.irow - 1;    // индекс строки ячейки
       int c = ya.icol - 1;    // индекс столбца ячейки
       //
-      Cell cellInp  = eInp.getCell(r,c);    // возьмем ячейку, согласно карте, во входном Excel
-      Cell cellOut  = eOut.getCell(r,c);    // выходная ячейка
+      Cell cellInp = eInp.getCell(r,c);    // возьмем ячейку, согласно карте, во входном Excel
+      Cell cellOut = eOut.getCell(r,c);    // выходная ячейка
       //
       boolean isBlank    = false;   // очистка содержимого ячейки
       String  strPattern = null;    // паттерн проверки значения
@@ -161,7 +155,7 @@ public class Main {
       // определено регулярное выражение для проверки соответствия значения в ячейке?
       if(null != strPattern) {
         // значение string
-        String sy = excel.getText(cellInp);
+        String  sy  = excel.getText(cellInp);
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
         if(!mat.matches())  // сравнивает ВСЮ строку с шаблоном
