@@ -227,8 +227,13 @@ public class excel {
           //break;
 
         case Cell.CELL_TYPE_STRING:
-          R.out(copycell + "string: " + inpCell.getStringCellValue());
-          outCell.setCellValue(inpCell.getStringCellValue());
+          String s1 = inpCell.getStringCellValue();
+          if(s1.isEmpty()) {
+            R.out(copycell + "empty string - don't copy");
+            return false;
+          }
+          R.out(copycell + "string: " + s1);
+          outCell.setCellValue(s1);
           break;
 
         case Cell.CELL_TYPE_BOOLEAN:

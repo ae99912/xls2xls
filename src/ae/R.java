@@ -37,11 +37,11 @@ package ae;
  29.12.25 удалил свойство @only-01
  14.01.26 в случае пустого типа в исходной ячейке, копирование не выполняется
  22.01.26 обработка ячеек строго по порядку в тексте карты
-
+ 16.03.26 не копировать пустые строки
 */
 
 public class R {
-    public final static String Ver = "v.9.1"; // номер версии
+    public final static String Ver = "v.9.2"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
