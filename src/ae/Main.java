@@ -8,6 +8,7 @@
  * 27.12.25 вставка строки в ячейку
  * 29.12.25 удалил свойство @only-01, оптимизация чтения входной строки
  * 22.01.26 обработка ячеек строго по порядку в тексте карты
+ * 28.03.28 разные листы входного и выходного файла
  *
 */
 
@@ -39,7 +40,9 @@ public class Main {
     //
     int ia = 0;
     String[] aaa = new String[3];  // карта входной_файл выходной_файл
-    int sheet = 0;  // номер листа для обработки
+    int sheetI = 0;  // номер входного листа для обработки
+    int sheetO = 0;  // номер выходного листа для обработки
+
     try {
       for (int i = 0; i < args.length; i++) {
         String arg = args[i];
@@ -54,7 +57,18 @@ public class Main {
 
           case "-s":  // номер sheet (листа)
             i++;
-            sheet = Integer.parseInt(args[i]);  // номер листа
+            sheetI = Integer.parseInt(args[i]);  // номер листа
+            sheetO = sheetI;
+            break;
+
+          case "-si":
+            i++;
+            sheetI = Integer.parseInt(args[i]);  // номер входного листа
+            break;
+
+          case "-so":
+            i++;
+            sheetO = Integer.parseInt(args[i]);  // номер выходного листа
             break;
 
           default:
@@ -72,15 +86,15 @@ public class Main {
     //
     // начнем обработку
     //
-    R.out("xls2xls " + R.Ver + "   sheet: " + sheet);
+    R.out("xls2xls " + R.Ver + "   sheet input: " + sheetI + " sheet output: " + sheetO);
     //
     String kartaFile = aaa[0];
     String inpFile   = aaa[1];
     String outFile   = aaa[2];
     //
     // объекты Excel
-    excel eInp = new excel(inpFile, sheet);
-    excel eOut = new excel(outFile, sheet);
+    excel eInp = new excel(inpFile, sheetI);
+    excel eOut = new excel(outFile, sheetO);
     int count = 0;
     // карта ячеек для копирования
     karta k = new karta();
@@ -180,19 +194,20 @@ public class Main {
 
   private final static String HelpMessage =
       "xls2xls " + R.Ver + "\n" +
-      "Help about program:\n" +
-      "> xls2xls [-v] [-s 0]  Karta.txt  Input.XLSX  Output.XLSX\n" +
-          "-v   отладочный вывод\n" +
-          "-s 0 обрабатываемый лист (sheet) 0, 1 и т.д. всех файлов\n" +
-              "\n" +
-              "спец обработка (свойства):\n" +
-              "  @only01   дальше заносим только 0 или 1\n" +
-              "  @onlyint  дальше заносим только целые числа\n" +
-              "  @onlynum  дальше заносим только числа действительные или целые\n" +
-              "  @all      дальше заносим что угодно\n" +
-              "  @blank    дальше ячейки, которые очищаются\n" +
-              "  @@regexp  дальше заносим ячейки если они соответствуют regexp\n" +
-              "  @=строка  дальше в ячейки заносится \"строка\"";
+      "> xls2xls [-v] [-s 0] [-si 0] [-so 0]  Karta.txt  Input.XLSX  Output.XLSX\n" +
+      "-v    отладочный вывод\n" +
+      "-s 0  обрабатываемый лист (sheet) 0, 1 и т.д. всех файлов\n" +
+      "-si 0 обрабатываемый лист входного файла\n" +
+      "-so 0 обрабатываемый лист выходного файла\n" +
+      "\n" +
+      "спец обработка (свойства):\n" +
+      "  @only01   дальше заносим только 0 или 1\n" +
+      "  @onlyint  дальше заносим только целые числа\n" +
+      "  @onlynum  дальше заносим только числа действительные или целые\n" +
+      "  @all      дальше заносим что угодно\n" +
+      "  @blank    дальше ячейки, которые очищаются\n" +
+      "  @@regexp  дальше заносим ячейки если они соответствуют regexp\n" +
+      "  @=строка  дальше в ячейки заносится \"строка\"";
 
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";
