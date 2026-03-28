@@ -38,17 +38,18 @@ package ae;
  14.01.26 в случае пустого типа в исходной ячейке, копирование не выполняется
  22.01.26 обработка ячеек строго по порядку в тексте карты
  16.03.26 не копировать пустые строки
- 28.03.26 разные листы входного и выходного файла
+ 28.03.26 разные листы входного и выходного файла, изменил свойства и добавил @any
 
 */
 
 public class R {
-    public final static String Ver = "v.10.0"; // номер версии
+    public final static String Ver = "v.10.1"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
     // свойства выходной ячейки
-    public final static String CELL_ALL     = "all";    // свойство любое значение ячейки
+    public final static String CELL_ALL     = "all";    // свойство любое непустое значение ячейки
+    public final static String CELL_ANY     = "any";    // свойство любое значение ячейки, в том числе и пустое
     public final static String CELL_BLANK   = "blank";  // свойство blank - очистка ячейки
     public final static String PAT_REGEX    = "@";      // свойство "регулярное выражение" @@
     public final static String PAT_INSTR    = "=";      // свойство "строка", которая записывается в ячейки

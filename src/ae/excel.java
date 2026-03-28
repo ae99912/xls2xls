@@ -205,9 +205,10 @@ public class excel {
    * В случае пустого типа в исходной ячейке, копирование не выполняется
    * @param inpCell входная ячейка
    * @param outCell выходная ячейка
+   * @param isAny   копировать любое, в том числе и пустое значение
    * @return true если копирование выполнено
    */
-  static boolean copyCell(Cell inpCell, Cell outCell)
+  static boolean copyCell(Cell inpCell, Cell outCell, boolean isAny)
   {
     final String copycell = inpCell.getAddress() + " "; // для отладочного вывода
     try {
@@ -218,21 +219,23 @@ public class excel {
           int typeo = inpCell.getCachedFormulaResultType();
           R.out(copycell + "formula: " + inpCell.getCellFormula());
           inpCell.setCellType(typeo);
-          return copyCell(inpCell, outCell);
+          return copyCell(inpCell, outCell, isAny);
 
         case Cell.CELL_TYPE_BLANK:
-          R.out(copycell + "blank don't copy");
-          // outCell.setCellType(Cell.CELL_TYPE_BLANK);
-          return false;
-          //break;
+          R.out(copycell + ((isAny) ? "blank copy" : "blank don't copy"));
+          if(!isAny) {
+            return false;
+          }
+          outCell.setCellType(Cell.CELL_TYPE_BLANK);
+          break;
 
         case Cell.CELL_TYPE_STRING:
           String s1 = inpCell.getStringCellValue();
-          if(s1.isEmpty()) {
+          if(s1.isEmpty() && !isAny) {
             R.out(copycell + "empty string - don't copy");
             return false;
           }
-          R.out(copycell + "string: " + s1);
+          R.out(copycell + "string: \"" + s1 + "\"");
           outCell.setCellValue(s1);
           break;
 
