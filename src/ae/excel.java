@@ -191,7 +191,7 @@ public class excel {
   /**
    * Получить текстовое содержание ячейки
    * @param cell ячейка
-   * @return  строка содержимого
+   * @return  строка содержимого ячейки
    * https://www.baeldung.com/java-apache-poi-cell-string-value
    */
   static String getText(Cell cell)
@@ -211,7 +211,7 @@ public class excel {
         return cell.getStringCellValue();
 
       case Cell.CELL_TYPE_BOOLEAN:
-        return cell.getBooleanCellValue()? "true": "false";
+        return cell.getBooleanCellValue()? "<True>": "<False>";
 
       case Cell.CELL_TYPE_NUMERIC:
         if(DateUtil.isCellDateFormatted(cell)) {
@@ -221,10 +221,10 @@ public class excel {
         return Double.toString(cell.getNumericCellValue());
 
       case Cell.CELL_TYPE_ERROR:
-        return "Error";
+        return "<Error>";
 
     }
-    return  "?";  // неизвестный тип
+    return  "<?>";  // неизвестный тип
   }
 
   /**
