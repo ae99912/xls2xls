@@ -39,11 +39,12 @@ package ae;
  22.01.26 обработка ячеек строго по порядку в тексте карты
  16.03.26 не копировать пустые строки
  28.03.26 разные листы входного и выходного файла, изменил свойства и добавил @any
+ 29.03.26 задать формат даты в выходной ячейке. Проработана функция excel.getText
 
 */
 
 public class R {
-    public final static String Ver = "v.10.1"; // номер версии
+    public final static String Ver = "v.10.3"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 
@@ -54,7 +55,9 @@ public class R {
     public final static String PAT_REGEX    = "@";      // свойство "регулярное выражение" @@
     public final static String PAT_INSTR    = "=";      // свойство "строка", которая записывается в ячейки
 
-    static boolean debug = false;   // отладочный вывод
+    public static String DateFormat = "dd.MM.yyyy";     // формат даты для выходной ячейки
+
+    static boolean verbose = false;   // подробный вывод
 
     /**
      * Вывести сообщение, если задан режим отладки
@@ -62,7 +65,7 @@ public class R {
      */
     static public void out(String message)
     {
-        if(debug) {
+        if(verbose) {
             System.out.println(message);
         }
     }

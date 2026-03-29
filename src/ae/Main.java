@@ -54,24 +54,23 @@ public class Main {
             System.out.println(HelpMessage);
             return;
 
-          case "-v":  // отладочный вывод
-            R.debug = true;
-            break;
-
-          case "-s":  // номер sheet (листа)
-            i++;
-            sheetI = Integer.parseInt(args[i]);  // номер листа
-            sheetO = sheetI;
+          case "-v":
+            R.verbose = true;                   // подробный вывод
             break;
 
           case "-si":
             i++;
-            sheetI = Integer.parseInt(args[i]);  // номер входного листа
+            sheetI = Integer.parseInt(args[i]); // номер входного листа
             break;
 
           case "-so":
             i++;
-            sheetO = Integer.parseInt(args[i]);  // номер выходного листа
+            sheetO = Integer.parseInt(args[i]); // номер выходного листа
+            break;
+
+          case "-df":
+            i++;
+            R.DateFormat = args[i];             // формат даты для выходной ячейки
             break;
 
           default:
@@ -89,7 +88,7 @@ public class Main {
     //
     // начнем обработку
     //
-    R.out("xls2xls " + R.Ver + "   sheet input: " + sheetI + " sheet output: " + sheetO);
+    R.out("xls2xls " + R.Ver + "   sheet input:" + sheetI + " sheet output:" + sheetO);
     //
     String kartaFile = aaa[0];
     String inpFile   = aaa[1];
@@ -124,7 +123,7 @@ public class Main {
           break;
 
         case "num":
-          strPattern = "-?[0-9]+\\.?[0-9]*";  // только числа (целые и действительные)
+          strPattern = "-?[0-9]+[.,]?[0-9]*"; // только числа (целые и действительные)
           break;
 
         case R.CELL_BLANK:
@@ -200,20 +199,20 @@ public class Main {
 
   private final static String HelpMessage =
       "xls2xls " + R.Ver + "\n" +
-      "> xls2xls [-v] [-s 0] [-si 0] [-so 0]  Karta.txt  Input.XLSX  Output.XLSX\n" +
-      "-v    отладочный вывод\n" +
-      "-s 0  обрабатываемый лист (sheet) 0, 1 и т.д. всех файлов\n" +
-      "-si 0 обрабатываемый лист входного файла\n" +
-      "-so 0 обрабатываемый лист выходного файла\n" +
+      "> xls2xls Karta.txt Input.XLSX Output.XLSX  [-v] [-si 0] [-so 0] [-df dd.MMM.yyyy]\n" +
+      "-v      подробный вывод\n" +
+      "-si 0   обрабатываемый лист входного файла\n" +
+      "-so 0   обрабатываемый лист выходного файла\n" +
+      "-df dd.MMM.yyyy   формат даты для выходной ячейки\n" +
       "\n" +
-      "спец обработка (свойства):\n" +
-      "  @int       дальше заносим только целые числа\n" +
-      "  @num       дальше заносим только числа действительные или целые\n" +
-      "  @all       дальше заносим любые непустые значения\n" +
-      "  @any       дальше заносим что угодно, в том числе пустые значения\n" +
-      "  @blank     дальше ячейки, которые очищаются\n" +
-      "  @@regexp   дальше заносим ячейки если они соответствуют regexp\n" +
-      "  @=строка   дальше в ячейки заносится \"строка\"";
+      "спец обработка (свойства) действия с последующими ячейками:\n" +
+      "  @int       копируем только целые числа\n" +
+      "  @num       копируем только числа действительные или целые\n" +
+      "  @all       копируем любые непустые значения\n" +
+      "  @any       копируем что угодно, в том числе пустые значения\n" +
+      "  @@regexp   копируем ячейки если они соответствуют regexp\n" +
+      "  @blank     ячейки очищаются\n" +
+      "  @=строка   в ячейки записывается \"строка\"";
 
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";

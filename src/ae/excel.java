@@ -196,16 +196,43 @@ public class excel {
    */
   static String getText(Cell cell)
   {
-    DataFormatter formatter = new DataFormatter();
-    return formatter.formatCellValue(cell);
+    int type = cell.getCellType();
+    switch(type) {
+
+      case Cell.CELL_TYPE_FORMULA:
+        int typeo = cell.getCachedFormulaResultType();
+        cell.setCellType(typeo);
+        return getText(cell);
+
+      case Cell.CELL_TYPE_BLANK:
+        return "";
+
+      case Cell.CELL_TYPE_STRING:
+        return cell.getStringCellValue();
+
+      case Cell.CELL_TYPE_BOOLEAN:
+        return cell.getBooleanCellValue()? "true": "false";
+
+      case Cell.CELL_TYPE_NUMERIC:
+        if(DateUtil.isCellDateFormatted(cell)) {
+          DataFormatter formatter = new DataFormatter();
+          return formatter.formatCellValue(cell);
+        }
+        return Double.toString(cell.getNumericCellValue());
+
+      case Cell.CELL_TYPE_ERROR:
+        return "Error";
+
+    }
+    return  "?";  // неизвестный тип
   }
 
   /**
-   * Копировать входную ячейку в выходную, взяв результат формулы
-   * В случае пустого типа в исходной ячейке, копирование не выполняется
+   * Копировать значение входной ячейки в выходную, если формула, то берется результат формулы.
+   * В случае пустого значения в исходной ячейке, копирование происходит по флагу isAny.
    * @param inpCell входная ячейка
    * @param outCell выходная ячейка
-   * @param isAny   копировать любое, в том числе и пустое значение
+   * @param isAny   копировать пустое значение ячейки
    * @return true если копирование выполнено
    */
   static boolean copyCell(Cell inpCell, Cell outCell, boolean isAny)
@@ -215,6 +242,7 @@ public class excel {
       int type = inpCell.getCellType();
       // значение string
       switch (type) {
+
         case Cell.CELL_TYPE_FORMULA:
           int typeo = inpCell.getCachedFormulaResultType();
           R.out(copycell + "formula: " + inpCell.getCellFormula());
@@ -253,9 +281,9 @@ public class excel {
             Pattern pat = Pattern.compile("[0-9]{1,2}/[0-9]{1,2}/[0-9]{2}");
             Matcher mat = pat.matcher(str);
             if(mat.find()) {
-              // найдена дата
+              // найдена дата - обработка ячейки с датой
               Date dat = inpCell.getDateCellValue();
-              SimpleDateFormat dateformat = new SimpleDateFormat("dd.MM.yyyy"); // "dd.MM.yyyy HH:mm:ss"
+              SimpleDateFormat dateformat = new SimpleDateFormat(R.DateFormat); // формат даты, например "dd.MM.yyyy HH:mm:ss"
               str = dateformat.format(dat);
             }
             outCell.setCellValue(str);  // запишем строковое значение время или даты
