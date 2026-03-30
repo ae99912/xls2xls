@@ -214,11 +214,8 @@ public class excel {
         return cell.getBooleanCellValue()? "<True>": "<False>";
 
       case Cell.CELL_TYPE_NUMERIC:
-        if(DateUtil.isCellDateFormatted(cell)) {
-          DataFormatter formatter = new DataFormatter();
-          return formatter.formatCellValue(cell);
-        }
-        return Double.toString(cell.getNumericCellValue());
+        DataFormatter formatter = new DataFormatter();
+        return formatter.formatCellValue(cell);
 
       case Cell.CELL_TYPE_ERROR:
         return "<Error>";
