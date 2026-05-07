@@ -41,11 +41,12 @@ package ae;
  28.03.26 разные листы входного и выходного файла, изменил свойства и добавил @any
  29.03.26 задать формат даты в выходной ячейке. Проработана функция excel.getText
  30.03.26 изменена обработка типа NUMERIC в функции getText
+ 07.05.26 явно установить тип выходной ячейки при записи строки и числа
 
 */
 
 public class R {
-    public final static String Ver = "v.10.4"; // номер версии
+    public final static String Ver = "v.10.5"; // номер версии
     
     //final static String sep = System.getProperty("file.separator"); // разделитель имени каталогов
 

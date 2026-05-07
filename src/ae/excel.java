@@ -261,6 +261,7 @@ public class excel {
             return false;
           }
           R.out(copycell + "string: \"" + s1 + "\"");
+          outCell.setCellType(Cell.CELL_TYPE_STRING); // явно установить тип вых. ячейки
           outCell.setCellValue(s1);
           break;
 
@@ -271,6 +272,7 @@ public class excel {
 
         case Cell.CELL_TYPE_NUMERIC:
           String str = getText(inpCell);  // текстовое содержимое ячейки
+          outCell.setCellType(Cell.CELL_TYPE_NUMERIC);
           // проверим на дату
           if(DateUtil.isCellDateFormatted(inpCell)) {
             // паттерн для поиска даты Excel 12/27/25 (m/d/yy) [0-9]{1,2}/[0-9]{1,2}/[0-9]{2}
