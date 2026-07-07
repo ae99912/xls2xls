@@ -143,6 +143,9 @@ public class Main {
             switch (s) {
               case R.PAT_REGEX:               // регулярное выражение
                 strPattern = ya.prop.substring(R.PAT_REGEX.length());
+                isAny = true;   // пусть будут любые (и пустые) значения определенные паттерном
+                // https://ru.stackoverflow.com/questions/435544/%D0%9F%D0%BE%D0%B8%D1%81%D0%BA-%D0%BF%D1%83%D1%81%D1%82%D0%BE%D0%B9-%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8-%D0%BF%D0%BE-%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BA%D0%B5
+                // например, пустая строка: (^\s*$) ^ значит начало строки, \s значит пробельный символ, * значит 0 раз или больше, и $ значит конец строки.
                 break;
 
               case R.PAT_INSTR:               // строка вставки в ячейку
