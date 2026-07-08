@@ -127,20 +127,20 @@ public class Main {
           break;
 
         case "01":
-          strPattern = "[0-1]+(\\.0)?";             // 0-1
+          strPattern = "^[0-1]{1}(\\.0)?";             // 0-1
           break;
 
         case "02":
-          strPattern = "[0-2]+(\\.0)?";             // 0-2
+          strPattern = "^[0-2]{1}(\\.0)?";             // 0-2
           break;
 
         case "_01":
-          strPattern = "(^\\s*$)|([0-1]+(\\.0)?)";  // пустое или 0-1
+          strPattern = "(^\\s*$)|(^[0-1]{1}(\\.0)?)";  // пустое или 0-1
           isAny = true;
           break;
 
         case "_02":
-          strPattern = "(^\\s*$)|([0-2]+(\\.0)?)";  // пустое или 0-2
+          strPattern = "(^\\s*$)|(^[0-2]{1}(\\.0)?)";  // пустое или 0-2
           isAny = true;
           break;
 
