@@ -201,6 +201,7 @@ public class excel {
 
       case Cell.CELL_TYPE_FORMULA:
         int typeo = cell.getCachedFormulaResultType();
+        R.out(cell.getAddress() + " formula: " + cell.getCellFormula());
         cell.setCellType(typeo);
         return getText(cell);
 
