@@ -184,26 +184,43 @@ public class excel {
     // После заполнения ячеек формулы не пересчитываются, поэтому выполним принудительно
     // перерасчет всех формул на листе
     // http://poi.apache.org/spreadsheet/eval.html#Re-calculating+all+formulas+in+a+Workbook
-    FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
-    for(Sheet sheet: f_wbk) { for(Row row: sheet) { for(Cell c: row) { if (c.getCellType() == Cell.CELL_TYPE_FORMULA) { evaluator.evaluateFormulaCell(c); } } } }
+    try {
+      assert f_wbk != null;
+      FormulaEvaluator evaluator = f_wbk.getCreationHelper().createFormulaEvaluator();
+      for(Sheet sheet : f_wbk) {for(Row row : sheet){for(Cell c : row){if(c.getCellType() == Cell.CELL_TYPE_FORMULA){ evaluator.evaluateFormulaCell(c);}}}}
+    }
+    catch (Exception e) {
+      System.err.println("?-Error-excel.calculate() " + e.getMessage());
+    }
   }
 
   /**
    * Получить текстовое содержание ячейки
    * @param cell ячейка
    * @return  строка содержимого ячейки
-   * https://www.baeldung.com/java-apache-poi-cell-string-value
    */
   static String getText(Cell cell)
   {
+    DataFormatter formatter;
+
     int type = cell.getCellType();
     switch(type) {
 
       case Cell.CELL_TYPE_FORMULA:
-        int typeo = cell.getCachedFormulaResultType();
-        R.out(cell.getAddress() + " formula: " + cell.getCellFormula());
-        cell.setCellType(typeo);
-        return getText(cell);
+        try {
+          // https://www.baeldung.com/java-apache-poi-cell-string-value
+          Workbook workbook = cell.getRow().getSheet().getWorkbook();
+          FormulaEvaluator evaluator = workbook.getCreationHelper().createFormulaEvaluator();
+          formatter = new DataFormatter();
+          return formatter.formatCellValue(cell, evaluator);
+        } catch (RuntimeException e) {
+          // throw new RuntimeException(e);
+          R.out("?-Error formula value of cell " + cell.getAddress() + ": " + e.getMessage());
+          return "<?>";
+        }
+        //        int typeo = cell.getCachedFormulaResultType();
+        //        cell.setCellType(typeo);
+        //        return getText(cell);
 
       case Cell.CELL_TYPE_BLANK:
         return "";
@@ -215,7 +232,7 @@ public class excel {
         return cell.getBooleanCellValue()? "<True>": "<False>";
 
       case Cell.CELL_TYPE_NUMERIC:
-        DataFormatter formatter = new DataFormatter();
+        formatter = new DataFormatter();
         return formatter.formatCellValue(cell);
 
       case Cell.CELL_TYPE_ERROR:
