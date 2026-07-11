@@ -191,16 +191,16 @@ public class Main {
       }
       // определена строка для вставки?
       if(null != strInsert) {
-        cellOut.setCellValue(strInsert);
-        R.out(cellOut.getAddress() + " =строка: " + strInsert);
-        count++;  // вставляем строку в ячейку
+        cellOut.setCellType(Cell.CELL_TYPE_STRING); // явно установить тип вых. ячейки
+        cellOut.setCellValue(strInsert);            // вставляем строку в ячейку
+        R.out(cellOut.getAddress() + " =\"" + strInsert + "\"");
+        count++;
         continue;
       }
       // определено регулярное выражение для проверки соответствия значения в ячейке?
       if(null != strPattern) {
-        // значение string
-        String  sy  = excel.getText(cellInp);
-        Pattern pat = Pattern.compile(strPattern);
+        String  sy  = excel.getText(cellInp);       // текстовое значение ячейки
+        Pattern pat = Pattern.compile(strPattern);  // паттерн regex
         Matcher mat = pat.matcher(sy);
         if(!mat.matches())  {   // сравнивает ВСЮ строку с шаблоном
           R.out("? " + cellInp.getAddress() + " (" + sy + ") don't matches \"" + strPattern + "\"");
@@ -226,12 +226,13 @@ public class Main {
 
   private final static String HelpMessage =
       "xls2xls " + R.Ver + "\n" +
-      "> xls2xls Karta.txt Input.XLSX Output.XLSX  [-v] [-si 0] [-so 0] [-df dd.MMM.yyyy]\n" +
-      "-v               подробный вывод\n" +
-      "-si 0            обрабатываемый лист входного файла\n" +
-      "-so 0            обрабатываемый лист выходного файла\n" +
-      "-df dd.MMM.yyyy  формат даты для выходной ячейки\n" +
+      "> xls2xls karta.txt input.xlsx output.xlsx  [-v] [-si 0] [-so 0] [-df " + R.DateFormat + "]\n" +
+      "-v           подробный вывод\n" +
+      "-si 0        обрабатываемый лист входного файла\n" +
+      "-so 0        обрабатываемый лист выходного файла\n" +
+      "-df format   формат даты для выходной ячейки (https://clck.ru/3Uey3a)\n" +
       "\n" +
+      "Копирует непустые ячейки из входного в выходной лист.\n" +
       "спец обработка (свойства) в последующие ячейки копируем:\n" +
       "  @int       только целые числа\n" +
       "  @num       только числа действительные или целые\n" +
