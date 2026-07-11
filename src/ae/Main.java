@@ -92,7 +92,7 @@ public class Main {
     //
     // начнем обработку
     //
-    R.out("xls2xls " + R.Ver + "   sheet input:" + sheetI + " sheet output:" + sheetO);
+    R.out("xls2xls " + R.Ver + "   sheet_input:" + sheetI + " sheet_output:" + sheetO);
     //
     String kartaFile = aaa[0];
     String inpFile   = aaa[1];
@@ -123,54 +123,54 @@ public class Main {
       switch (ya.prop) {
 
         case "int":
-          strPattern = "-?[0-9]+(\\.0)?";           // только целые
+          strPattern = "^-?[0-9]+$";            // только целые
           break;
 
         case "num":
-          strPattern = "-?[0-9]+[.,]?[0-9]*";       // только числа (целые и действительные)
+          strPattern = "^-?[0-9]+[.,]?[0-9]*$"; // только числа (целые и действительные)
           break;
 
         case "01":
-          strPattern = "^[0-1]{1}(\\.0)?";             // 0-1
+          strPattern = "^[0-1]$";               // 0-1
           break;
 
         case "012":
-          strPattern = "^[0-2]{1}(\\.0)?";             // 0-2
+          strPattern = "^[0-2]$";               // 0-2
           break;
 
         case "_01":
-          strPattern = "(^\\s*$)|(^[0-1]{1}(\\.0)?)";  // пустое или 0-1
+          strPattern = "(^\\s*$)|(^[0-1]$)";    // пустое или 0-1
           isAny = true;
           break;
 
         case "_012":
-          strPattern = "(^\\s*$)|(^[0-2]{1}(\\.0)?)";  // пустое или 0-2
+          strPattern = "(^\\s*$)|(^[0-2]$)";    // пустое или 0-2
           isAny = true;
           break;
 
         case R.CELL_BLANK:
-          isBlank = true;                     // очистка ячейки
+          isBlank = true;                       // очистка ячейки
           break;
 
-        case R.CELL_ALL:                      // любое значение
+        case R.CELL_ALL:                        // любое значение
           break;
 
-        case R.CELL_ANY:                      // любое и пустое значения
+        case R.CELL_ANY:                        // любое и пустое значения
           isAny = true;
           break;
 
         default:
           if (ya.prop.length() > 1) {
-            String s = ya.prop.substring(0, 1);  // буква свойства
+            String s = ya.prop.substring(0, 1); // буква свойства
             switch (s) {
-              case R.PAT_REGEX:               // регулярное выражение
+              case R.PAT_REGEX:                 // регулярное выражение
                 strPattern = ya.prop.substring(R.PAT_REGEX.length());
                 isAny = true;   // пусть будут любые (и пустые) значения определенные паттерном
                 // https://ru.stackoverflow.com/questions/435544/%D0%9F%D0%BE%D0%B8%D1%81%D0%BA-%D0%BF%D1%83%D1%81%D1%82%D0%BE%D0%B9-%D1%81%D1%82%D1%80%D0%BE%D0%BA%D0%B8-%D0%BF%D0%BE-%D1%80%D0%B5%D0%B3%D1%83%D0%BB%D1%8F%D1%80%D0%BA%D0%B5
                 // например, пустая строка: (^\s*$) ^ значит начало строки, \s значит пробельный символ, * значит 0 раз или больше, и $ значит конец строки.
                 break;
 
-              case R.PAT_INSTR:               // строка вставки в ячейку
+              case R.PAT_INSTR:                 // строка вставки в ячейку
                 strInsert = ya.prop.substring(R.PAT_INSTR.length());  // строка для вставки
                 break;
 
@@ -202,8 +202,10 @@ public class Main {
         String  sy  = excel.getText(cellInp);
         Pattern pat = Pattern.compile(strPattern);
         Matcher mat = pat.matcher(sy);
-        if(!mat.matches())  // сравнивает ВСЮ строку с шаблоном
+        if(!mat.matches())  {   // сравнивает ВСЮ строку с шаблоном
+          R.out("? " + cellInp.getAddress() + " (" + sy + ") don't matches \"" + strPattern + "\"");
           continue;   // не соответствует шаблону - пропускаем
+        }
       }
       if(excel.copyCell(cellInp, cellOut, isAny)) {  // копируем значение ячейки в ячейку выходного Excel
         count++;      // считаем переносы значений
@@ -225,23 +227,23 @@ public class Main {
   private final static String HelpMessage =
       "xls2xls " + R.Ver + "\n" +
       "> xls2xls Karta.txt Input.XLSX Output.XLSX  [-v] [-si 0] [-so 0] [-df dd.MMM.yyyy]\n" +
-      "-v      подробный вывод\n" +
-      "-si 0   обрабатываемый лист входного файла\n" +
-      "-so 0   обрабатываемый лист выходного файла\n" +
-      "-df dd.MMM.yyyy   формат даты для выходной ячейки\n" +
+      "-v               подробный вывод\n" +
+      "-si 0            обрабатываемый лист входного файла\n" +
+      "-so 0            обрабатываемый лист выходного файла\n" +
+      "-df dd.MMM.yyyy  формат даты для выходной ячейки\n" +
       "\n" +
-      "спец обработка (свойства) действия с последующими ячейками:\n" +
-      "  @int       копируем только целые числа\n" +
-      "  @num       копируем только числа действительные или целые\n" +
-      "  @all       копируем любые непустые значения\n" +
-      "  @any       копируем что угодно, в том числе пустые значения\n" +
-      "  @01        копируем 0 или 1\n" +
-      "  @012       копируем 0 или 1 или 2\n" +
-      "  @_01       копируем пустое или 0 или 1\n" +
-      "  @_012      копируем пустое или 0 или 1 или 2\n" +
-      "  @@regexp   копируем ячейки если они соответствуют regexp (в том числе и пустые значения)\n" +
-      "  @blank     ячейки очищаются\n" +
-      "  @=строка   в ячейки записывается \"строка\"";
+      "спец обработка (свойства) в последующие ячейки копируем:\n" +
+      "  @int       только целые числа\n" +
+      "  @num       только числа действительные или целые\n" +
+      "  @all       любые непустые значения\n" +
+      "  @any       что угодно, в том числе пустые значения\n" +
+      "  @01        0 или 1\n" +
+      "  @012       0 или 1 или 2\n" +
+      "  @_01       пустое или 0 или 1\n" +
+      "  @_012      пустое или 0 или 1 или 2\n" +
+      "  @@regexp   ячейки если они соответствуют regexp (пустые тоже)\n" +
+      "  @blank     пустое значение - ячейки очищаются\n" +
+      "  @=строка   строку - в ячейки записывается \"строка\"";
 
   private final static String ErrMessage =
       "Неправильный формат командной строки. Смотри -?";
