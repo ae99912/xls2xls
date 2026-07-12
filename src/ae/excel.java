@@ -202,8 +202,7 @@ public class excel {
   static String getText(Cell cell)
   {
     DataFormatter formatter;
-
-    int type = cell.getCellType();
+    int type = cell.getCellType();        // тип ячейки
     switch(type) {
 
       case Cell.CELL_TYPE_FORMULA:
@@ -218,9 +217,6 @@ public class excel {
           R.out("?-Error formula value of cell " + cell.getAddress() + ": " + e.getMessage());
           return "<?>";
         }
-        //        int typeo = cell.getCachedFormulaResultType();
-        //        cell.setCellType(typeo);
-        //        return getText(cell);
 
       case Cell.CELL_TYPE_BLANK:
         return "";
@@ -254,8 +250,7 @@ public class excel {
   {
     final String copycell = inpCell.getAddress() + " "; // для отладочного вывода
     try {
-      int type = inpCell.getCellType();
-      // значение string
+      int type = inpCell.getCellType();   // тип входной ячейки
       switch (type) {
 
         case Cell.CELL_TYPE_FORMULA:
